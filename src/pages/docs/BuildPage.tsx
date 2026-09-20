@@ -11,11 +11,11 @@ const platforms = [
   { name: 'Desktop (macOS)', cmd: 'egm build desktop macos', output_en: 'Swift/WKWebView application and, when available, a DMG', output_pt: 'Aplicativo Swift/WKWebView e, quando disponível, um DMG', icon: '🖥️', badge: null },
   { name: 'Desktop (Windows)', cmd: 'egm build desktop windows', output_en: 'Tauri project for Windows packaging', output_pt: 'Projeto Tauri para empacotamento Windows', icon: '🪟', badge: null },
   { name: 'Desktop (Linux)', cmd: 'egm build desktop linux', output_en: 'Tauri project for Linux packaging', output_pt: 'Projeto Tauri para empacotamento Linux', icon: '🐧', badge: null },
-  { name: 'Tizen (Samsung TV)', cmd: 'egm build tizen', output_en: '.wgt package for Samsung Smart TV', output_pt: 'Pacote .wgt para Samsung Smart TV', icon: '📺', badge: 'NEW' },
+  { name: 'Tizen (Samsung TV)', cmd: 'egm build tizen', output_en: 'Tizen project; Tizen Studio packages the .wgt', output_pt: 'Projeto Tizen; o Tizen Studio gera o .wgt', icon: '📺', badge: 'NEW' },
   { name: 'WebOS (LG TV)', cmd: 'egm build webos', output_en: '.ipk package for LG Smart TV', output_pt: 'Pacote .ipk para LG Smart TV', icon: '📺', badge: 'NEW' },
-  { name: 'Android TV', cmd: 'egm build androidtv', output_en: 'Android APK optimized for TV input', output_pt: 'APK Android otimizado para entrada TV', icon: '📺', badge: 'NEW' },
+  { name: 'Android TV', cmd: 'egm build androidtv', output_en: 'Gradle project optimized for TV input', output_pt: 'Projeto Gradle otimizado para entrada de TV', icon: '📺', badge: 'NEW' },
   { name: 'tvOS', cmd: 'egm build tvos', output_en: 'Xcode project for Apple TV', output_pt: 'Projeto Xcode para Apple TV', icon: '📺', badge: 'NEW' },
-  { name: 'Xbox', cmd: 'egm build xbox', output_en: 'PWA files and an attempted MSIX package', output_pt: 'Arquivos PWA e uma tentativa de pacote MSIX', icon: '🎮', badge: 'NEW' },
+  { name: 'Xbox', cmd: 'egm build xbox', output_en: 'PWA project; Windows SDK creates the MSIX package', output_pt: 'Projeto PWA; o Windows SDK gera o pacote MSIX', icon: '🎮', badge: 'NEW' },
   { name: 'PlayStation', cmd: 'egm build playstation', output_en: 'PlayStation project files; Sony SDK steps remain manual', output_pt: 'Arquivos de projeto PlayStation; etapas do SDK Sony continuam manuais', icon: '🎮', badge: 'NEW' },
 ]
 
@@ -46,8 +46,8 @@ export function BuildPage() {
         badge="CLI"
         description={
           lang === 'en'
-            ? '10+ build targets from a single codebase. One command deploys to web, iOS, Android, desktop, Smart TVs, and consoles.'
-            : '10+ destinos de build a partir de uma única codebase. Um comando implanta para web, iOS, Android, desktop, Smart TVs e consoles.'
+            ? '10+ build targets from a single codebase. Generate web bundles and native projects for desktop, Smart TVs, and consoles.'
+            : 'Mais de 10 destinos de build a partir de uma única base de código. Gere bundles web e projetos nativos para desktop, Smart TVs e consoles.'
         }
       />
 
@@ -86,8 +86,8 @@ export function BuildPage() {
 
         <Callout type="warning">
           {lang === 'en'
-            ? 'iOS and Android builds require Xcode and Android Studio respectively. Windows and Linux use Tauri project templates; TV and console targets are experimental.'
-            : 'Builds iOS e Android requerem Xcode e Android Studio, respectivamente. Windows e Linux usam templates de projeto Tauri; destinos de TV e console são experimentais.'}
+            ? 'Native packages require each platform SDK: Tizen Studio, webOS CLI, Android Studio, Xcode, Windows SDK, or PlayStation Partners tools. TV and console targets are experimental.'
+            : 'Pacotes nativos exigem o SDK de cada plataforma: Tizen Studio, CLI webOS, Android Studio, Xcode, Windows SDK ou ferramentas PlayStation Partners. Os destinos de TV e console são experimentais.'}
         </Callout>
       </div>
     </DocLayout>
