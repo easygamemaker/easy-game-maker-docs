@@ -5,18 +5,18 @@ import { useLang } from '@/context/LangContext'
 import { Badge } from '@/components/ui/Badge'
 
 const platforms = [
-  { name: 'Web', cmd: 'egm build web', output_en: 'dist/web, a Vite production bundle', output_pt: 'dist/web, um bundle de produção Vite', icon: '🌐', badge: null },
-  { name: 'iOS', cmd: 'egm build ios', output_en: 'Xcode project with a WebView shell', output_pt: 'Projeto Xcode com uma shell WebView', icon: '🍎', badge: null },
-  { name: 'Android', cmd: 'egm build android', output_en: 'Gradle/Kotlin project with a WebView shell', output_pt: 'Projeto Gradle/Kotlin com uma shell WebView', icon: '🤖', badge: null },
-  { name: 'Desktop (macOS)', cmd: 'egm build desktop macos', output_en: 'Swift/WKWebView application and, when available, a DMG', output_pt: 'Aplicativo Swift/WKWebView e, quando disponível, um DMG', icon: '🖥️', badge: null },
-  { name: 'Desktop (Windows)', cmd: 'egm build desktop windows', output_en: 'Tauri project for Windows packaging', output_pt: 'Projeto Tauri para empacotamento Windows', icon: '🪟', badge: null },
-  { name: 'Desktop (Linux)', cmd: 'egm build desktop linux', output_en: 'Tauri project for Linux packaging', output_pt: 'Projeto Tauri para empacotamento Linux', icon: '🐧', badge: null },
-  { name: 'Tizen (Samsung TV)', cmd: 'egm build tizen', output_en: 'Tizen project; Tizen Studio packages the .wgt', output_pt: 'Projeto Tizen; o Tizen Studio gera o .wgt', icon: '📺', badge: 'NEW' },
-  { name: 'WebOS (LG TV)', cmd: 'egm build webos', output_en: '.ipk package for LG Smart TV', output_pt: 'Pacote .ipk para LG Smart TV', icon: '📺', badge: 'NEW' },
-  { name: 'Android TV', cmd: 'egm build androidtv', output_en: 'Gradle project optimized for TV input', output_pt: 'Projeto Gradle otimizado para entrada de TV', icon: '📺', badge: 'NEW' },
-  { name: 'tvOS', cmd: 'egm build tvos', output_en: 'Xcode project for Apple TV', output_pt: 'Projeto Xcode para Apple TV', icon: '📺', badge: 'NEW' },
-  { name: 'Xbox', cmd: 'egm build xbox', output_en: 'PWA project; Windows SDK creates the MSIX package', output_pt: 'Projeto PWA; o Windows SDK gera o pacote MSIX', icon: '🎮', badge: 'NEW' },
-  { name: 'PlayStation', cmd: 'egm build playstation', output_en: 'PlayStation project files; Sony SDK steps remain manual', output_pt: 'Arquivos de projeto PlayStation; etapas do SDK Sony continuam manuais', icon: '🎮', badge: 'NEW' },
+  { name: 'Web', cmd: 'egm build web', output_en: 'dist/web, a Vite production bundle', output_pt: 'dist/web, um bundle de produção Vite', icon: '🌐', available: false },
+  { name: 'iOS', cmd: 'egm build ios', output_en: 'Xcode project with a WebView shell', output_pt: 'Projeto Xcode com uma shell WebView', icon: '🍎', available: false },
+  { name: 'Android', cmd: 'egm build android', output_en: 'Gradle/Kotlin project with a WebView shell', output_pt: 'Projeto Gradle/Kotlin com uma shell WebView', icon: '🤖', available: false },
+  { name: 'Desktop (macOS)', cmd: 'egm build desktop macos', output_en: 'Swift/WKWebView application and, when available, a DMG', output_pt: 'Aplicativo Swift/WKWebView e, quando disponível, um DMG', icon: '🖥️', available: true },
+  { name: 'Desktop (Windows)', cmd: 'egm build desktop windows', output_en: 'Tauri project for Windows packaging', output_pt: 'Projeto Tauri para empacotamento Windows', icon: '🪟', available: true },
+  { name: 'Desktop (Linux)', cmd: 'egm build desktop linux', output_en: 'Tauri project for Linux packaging', output_pt: 'Projeto Tauri para empacotamento Linux', icon: '🐧', available: true },
+  { name: 'Tizen (Samsung TV)', cmd: 'egm build tizen', output_en: 'Tizen project; Tizen Studio packages the .wgt', output_pt: 'Projeto Tizen; o Tizen Studio gera o .wgt', icon: '📺', available: false },
+  { name: 'WebOS (LG TV)', cmd: 'egm build webos', output_en: '.ipk package for LG Smart TV', output_pt: 'Pacote .ipk para LG Smart TV', icon: '📺', available: false },
+  { name: 'Android TV', cmd: 'egm build androidtv', output_en: 'Gradle project optimized for TV input', output_pt: 'Projeto Gradle otimizado para entrada de TV', icon: '📺', available: false },
+  { name: 'tvOS', cmd: 'egm build tvos', output_en: 'Xcode project for Apple TV', output_pt: 'Projeto Xcode para Apple TV', icon: '📺', available: false },
+  { name: 'Xbox', cmd: 'egm build xbox', output_en: 'PWA project; Windows SDK creates the MSIX package', output_pt: 'Projeto PWA; o Windows SDK gera o pacote MSIX', icon: '🎮', available: false },
+  { name: 'PlayStation', cmd: 'egm build playstation', output_en: 'PlayStation project files; Sony SDK steps remain manual', output_pt: 'Arquivos de projeto PlayStation; etapas do SDK Sony continuam manuais', icon: '🎮', available: false },
 ]
 
 const CONFIG_EXAMPLE = `// egm.config.ts
@@ -46,8 +46,8 @@ export function BuildPage() {
         badge="CLI"
         description={
           lang === 'en'
-            ? '10+ build targets from a single codebase. Generate web bundles and native projects for desktop, Smart TVs, and consoles.'
-            : 'Mais de 10 destinos de build a partir de uma única base de código. Gere bundles web e projetos nativos para desktop, Smart TVs e consoles.'
+            ? 'Desktop builds (macOS, Windows, Linux) are available today. Web, mobile, Smart TV and console targets are coming soon.'
+            : 'Os builds de desktop (macOS, Windows, Linux) já estão disponíveis. Os destinos web, mobile, Smart TV e console chegam em breve.'
         }
       />
 
@@ -70,7 +70,9 @@ export function BuildPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[#f0f0f8] text-sm font-semibold">{p.name}</span>
-                    {p.badge && <Badge variant="green">{p.badge}</Badge>}
+                    <Badge variant={p.available ? 'green' : 'muted'}>
+                      {p.available ? (lang === 'en' ? 'Available' : 'Disponível') : lang === 'en' ? 'Coming soon' : 'Em breve'}
+                    </Badge>
                   </div>
                   <code className="text-[#8b85ff] font-mono text-xs bg-[#6c63ff11] px-2 py-0.5 rounded block w-fit mb-1">
                     {p.cmd}
@@ -86,8 +88,8 @@ export function BuildPage() {
 
         <Callout type="warning">
           {lang === 'en'
-            ? 'Native packages require each platform SDK: Tizen Studio, webOS CLI, Android Studio, Xcode, Windows SDK, or PlayStation Partners tools. TV and console targets are experimental.'
-            : 'Pacotes nativos exigem o SDK de cada plataforma: Tizen Studio, CLI webOS, Android Studio, Xcode, Windows SDK ou ferramentas PlayStation Partners. Os destinos de TV e console são experimentais.'}
+            ? 'Only the desktop target can be built for now. Running any other target prints a "not available yet" message and exits with code 1. Native packages require each platform SDK: Tizen Studio, webOS CLI, Android Studio, Xcode, Windows SDK, or PlayStation Partners tools. TV and console targets are experimental.'
+            : 'Por enquanto só o destino desktop pode ser gerado. Qualquer outro imprime a mensagem "not available yet" e encerra com código 1. Pacotes nativos exigem o SDK de cada plataforma: Tizen Studio, CLI webOS, Android Studio, Xcode, Windows SDK ou ferramentas PlayStation Partners. Os destinos de TV e console são experimentais.'}
         </Callout>
       </div>
     </DocLayout>

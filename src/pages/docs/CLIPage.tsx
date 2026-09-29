@@ -85,12 +85,12 @@ export function CLIPage() {
 
         <CLICommand
           command="egm build <platform>"
-          description_en="Build for a target platform. Supports: web, ios, android, desktop, tizen, webos, androidtv, tvos, xbox, playstation."
-          description_pt="Build para uma plataforma alvo. Suporta: web, ios, android, desktop, tizen, webos, androidtv, tvos, xbox, playstation."
+          description_en="Build for a target platform. Only desktop is available for now; web, ios, android, tizen, webos, androidtv, tvos, xbox and playstation print a 'not available yet' message and exit with code 1."
+          description_pt="Build para uma plataforma alvo. Por enquanto só o desktop está disponível; web, ios, android, tizen, webos, androidtv, tvos, xbox e playstation mostram a mensagem 'not available yet' e encerram com código 1."
           flags={[
             { flag: '[os]', desc_en: 'For desktop: macos | windows | linux (default: all)', desc_pt: 'Para desktop: macos | windows | linux (padrão: todos)' },
           ]}
-          example="egm build web\negm build ios\negm build desktop macos\negm build android"
+          example="egm build desktop\negm build desktop macos\negm build desktop windows\negm build desktop linux"
         />
 
         <CLICommand
