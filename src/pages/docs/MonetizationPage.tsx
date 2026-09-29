@@ -64,6 +64,12 @@ export function MonetizationPage() {
             : 'IAP requer builds nativas (iOS/Android). No simulador, compras mostram mocks de bottom sheet do Apple Pay e Google Play.'}
           </Callout>
         </ApiSection>
+        <ApiSection title={lang === 'en' ? 'Native builds' : 'Builds nativas'}>
+          <Callout type="info">{lang === 'en'
+            ? 'When egm.config.ts has a monetization block, the iOS and Android builds generate the native bridges (AdMob and StoreKit on iOS, AdMob and Google Play Billing on Android) and register them as window.EgmNative before your game loads. Without your own AdMob IDs, the build uses Google sample IDs, which serve test ads. iOS and Android builds are coming soon.'
+            : 'Quando o egm.config.ts tem um bloco monetization, os builds de iOS e Android geram as pontes nativas (AdMob e StoreKit no iOS, AdMob e Google Play Billing no Android) e as registram como window.EgmNative antes de o jogo carregar. Sem IDs próprios do AdMob, o build usa os IDs de exemplo do Google, que exibem anúncios de teste. Os builds de iOS e Android chegam em breve.'}
+          </Callout>
+        </ApiSection>
       </div>
     </DocLayout>
   )
