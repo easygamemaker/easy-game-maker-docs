@@ -127,6 +127,11 @@ export function HomePage() {
             </div>
           ))}
         </div>
+        <p className="mt-4 text-center text-xs text-[#55556a] max-w-xl mx-auto leading-relaxed">
+          {lang === 'en'
+            ? 'Desktop builds are available today. The other platforms are under review while we prepare the upcoming EGM Marketplace.'
+            : 'Os builds de desktop já estão disponíveis. As demais plataformas estão em revisão enquanto preparamos o futuro EGM Marketplace.'}
+        </p>
       </div>
 
       {/* Hero image */}
