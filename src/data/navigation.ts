@@ -474,6 +474,7 @@ export const NAVIGATION: NavSection[] = [
       item('/examples/monetization-demo', 'Monetization Demo', 'Demo de Monetização', undefined, '2d'),
       item('/examples/coin-run-3d', 'Coin Run 3D', 'Coin Run 3D', undefined, '3d'),
       item('/examples/orbit-dodge-3d', 'Orbit Dodge 3D', 'Orbit Dodge 3D', undefined, '3d'),
+      item('/examples/neon-siege-3d', 'Neon Siege 3D', 'Neon Siege 3D', undefined, '3d'),
     ],
   },
 ]

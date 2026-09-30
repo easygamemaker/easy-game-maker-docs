@@ -50,7 +50,7 @@ const page: DocPage = {
             { name: 'lookAt', type: '[number, number, number]', default: '[0, 0, 0]', description: t('Initial camera target.', 'Alvo inicial da câmera.') },
             { name: 'antialias', type: 'boolean', default: 'true', description: t('Renderer flag.', 'Flag do renderizador.') },
             { name: 'alpha', type: 'boolean', default: 'false', description: t('Renderer flag.', 'Flag do renderizador.') },
-            { name: 'shadows', type: 'boolean', default: 'true', description: t('Enables the shadow map (soft PCF).', 'Ativa o shadow map (com PCF, Percentage-Closer Filtering, para sombras suaves).') },
+            { name: 'shadows', type: 'boolean', default: 'true', description: t('Enables the shadow map (PCF, `THREE.PCFShadowMap`).', 'Ativa o shadow map (com PCF, Percentage-Closer Filtering, no modo `THREE.PCFShadowMap`).') },
             { name: 'maxPixelRatio', type: 'number', default: '2', description: t('Beyond 2 the extra pixels cost framerate and nobody can see them.', 'Acima de 2, os pixels extras custam framerate e ninguém os enxerga.') },
             { name: 'toneMapping', type: 'THREE.ToneMapping', default: 'ACES filmic', description: t('Output tone mapping.', 'Tone mapping da saída.') },
             { name: 'exposure', type: 'number', default: '1', description: t('Output exposure.', 'Exposição da saída.') },
