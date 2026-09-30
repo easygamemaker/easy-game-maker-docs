@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>EGM E2E — Cut the Rope</title>
+<style>
+/* ── Reset ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{
+  --bg:#07090f; --surface:#0c0f19; --surface2:#11141f; --surface3:#161a28;
+  --border:#1a1f30; --border2:#202536;
+  --tx:#dce8f5; --tx-dim:#5a6880; --tx-muted:#2e3650;
+  --green:#0fd97e; --green-dim:#0a8a4f; --green-bg:#07201a;
+  --red:#f84060;   --red-dim:#9c1830;   --red-bg:#200a10;
+  --amber:#f59e2a; --amber-bg:#1e1404;
+  --indigo:#7b82ff; --cyan:#22d3ee; --sky:#38bdf8;
+  --r:6px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;font-size:13px;
+  line-height:1.5}
+
+/* ── App shell ──────────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh}
+
+/* Header */
+#hdr{
+  height:48px;display:flex;align-items:center;gap:0;flex-shrink:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+#hdr-left{
+  display:flex;align-items:center;gap:10px;padding:0 18px;
+  border-right:1px solid var(--border);height:100%;
+}
+.logo-chip{
+  background:var(--indigo);color:#fff;font-size:10px;font-weight:800;
+  letter-spacing:.08em;padding:3px 7px;border-radius:4px;
+}
+.hdr-proj{color:var(--tx-dim);font-size:13px}
+#hdr-status{
+  display:flex;align-items:center;gap:8px;padding:0 18px;margin-left:auto;
+}
+.status-pill{
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  letter-spacing:.06em;
+}
+.sp-idle   {background:var(--surface3);color:var(--tx-dim);border:1px solid var(--border2)}
+.sp-running{background:#1a1f0a;color:var(--green);border:1px solid #0d4a25;animation:glow 1.5s ease-in-out infinite}
+.sp-passed {background:var(--green-bg);color:var(--green);border:1px solid var(--green-dim)}
+.sp-failed {background:var(--red-bg);color:var(--red);border:1px solid var(--red-dim)}
+.sp-stopped{background:var(--surface3);color:var(--amber);border:1px solid #4a3010}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 8px #0fd97e44}}
+.hdr-rec{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx-dim)}
+.rec-indicator{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;display:none}
+.rec-indicator.active{display:block;animation:blink .8s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+#hdr-actions{padding:0 12px;display:flex;gap:6px;align-items:center}
+.hbtn{
+  padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:600;
+  border:none;cursor:pointer;letter-spacing:.02em;transition:filter .12s,opacity .12s;
+}
+.hbtn:hover:not(:disabled){filter:brightness(1.12)}
+.hbtn:disabled{opacity:.35;cursor:default}
+.hbtn-primary{background:var(--indigo);color:#fff}
+.hbtn-ghost {background:var(--surface2);color:var(--tx-dim);border:1px solid var(--border2)}
+.hbtn-danger{background:#3a0a14;color:var(--red);border:1px solid var(--red-dim)}
+.hbtn-rec  {background:var(--red-bg);color:var(--red);border:1px solid var(--red-dim)}
+
+/* ── Main: RUNNING view ─────────────────────────────── */
+#main-run{display:flex;flex:1;overflow:hidden}
+
+/* Game pane */
+#game-pane{
+  flex:0 0 58%;display:flex;flex-direction:column;
+  background:#000;border-right:1px solid var(--border);overflow:hidden;position:relative;
+}
+#gp-header{
+  height:34px;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+.gp-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--tx-dim)}
+.gp-info{font-size:11px;color:var(--tx-muted)}
+.gp-rec-badge{
+  margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.05em;
+  padding:2px 7px;border-radius:3px;display:none;
+  background:#3a0a14;color:var(--red);border:1px solid var(--red-dim);
+}
+.gp-rec-badge.active{display:block}
+#gp-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:16px}
+#gf-box{position:relative;display:inline-flex;flex-shrink:0;line-height:0}
+#game-frame{border:1px solid var(--border2);border-radius:4px;max-width:100%;max-height:100%;display:block}
+#ev-overlay{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5;border-radius:4px}
+#cursor-dot{
+  position:absolute;width:16px;height:16px;border-radius:50%;
+  background:rgba(123,130,255,.85);border:2px solid #fff;
+  pointer-events:none;transform:translate(-50%,-50%);display:none;z-index:10;
+  box-shadow:0 0 12px rgba(123,130,255,.5);
+  transition:left .06s linear,top .06s linear;
+}
+@keyframes ev-ripple{0%{transform:scale(0);opacity:1}60%{transform:scale(1.5);opacity:.7}100%{transform:scale(2.4);opacity:0}}
+.ev-ripple{
+  position:absolute;width:30px;height:30px;margin:-15px;border-radius:50%;
+  border:2.5px solid rgba(255,220,50,.95);background:rgba(255,220,50,.18);
+  transform:scale(0);animation:ev-ripple .7s ease-out forwards;pointer-events:none;
+}
+.step.s-assert.s-passed{border-left:2px solid var(--cyan)!important}
+.step.s-assert.s-passed .sicon{color:var(--cyan)!important}
+.step.s-assert.s-failed {border-left:2px solid var(--red)}
+
+/* Test pane (running) */
+#test-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#tp-header{
+  height:34px;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+.tp-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--tx-dim)}
+.tp-count{font-size:11px;color:var(--tx-muted)}
+#test-scroll{flex:1;overflow-y:auto;padding:6px 0}
+#test-scroll::-webkit-scrollbar{width:4px}
+#test-scroll::-webkit-scrollbar-track{background:transparent}
+#test-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Suite */
+.suite{border-bottom:1px solid var(--border)}
+.suite-hdr{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  cursor:pointer;user-select:none;transition:background .1s;
+}
+.suite-hdr:hover{background:var(--surface2)}
+.si{width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:900}
+.si-idle   {background:var(--surface3);color:var(--tx-dim)}
+.si-running{background:#1a1f0a;color:var(--green);animation:pulse .9s ease-in-out infinite}
+.si-passed {background:var(--green-bg);color:var(--green)}
+.si-failed {background:var(--red-bg);color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.suite-name{font-size:13px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suite-stat{font-size:11px;color:var(--tx-dim);white-space:nowrap}
+.suite-dur {font-size:11px;color:var(--tx-muted);margin-left:4px;white-space:nowrap}
+
+/* Steps */
+.steps{display:none;padding:0 14px 8px 38px}
+.steps.open{display:block}
+.step{
+  display:flex;align-items:flex-start;gap:8px;padding:5px 6px;
+  border-radius:4px;margin-bottom:1px;
+}
+.step.s-idle    {opacity:.45}
+.step.s-running {background:rgba(245,158,42,.06);border-left:2px solid var(--amber)}
+.step.s-passed  {border-left:2px solid var(--green-bg)}
+.step.s-failed  {background:rgba(248,64,96,.06);border-left:2px solid var(--red)}
+.sicon{font-size:10px;width:14px;text-align:center;flex-shrink:0;margin-top:2px;font-weight:700}
+.step.s-idle    .sicon{color:var(--tx-muted)}
+.step.s-running .sicon{color:var(--amber)}
+.step.s-passed  .sicon{color:var(--green)}
+.step.s-failed  .sicon{color:var(--red)}
+.s-body{flex:1;min-width:0}
+.s-name{font-size:12px;color:var(--tx);font-weight:500}
+.s-detail{font-size:11px;color:var(--tx-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s-err{
+  font-size:11px;color:var(--red);margin-top:5px;white-space:pre-wrap;word-break:break-all;
+  background:#1a0508;padding:7px 9px;border-radius:4px;border:1px solid #3a0a14;
+}
+.s-dur{font-size:10px;color:var(--tx-muted);flex-shrink:0;margin-top:2px;white-space:nowrap}
+
+/* ── Footer ─────────────────────────────────────────── */
+#footer{
+  height:38px;display:flex;align-items:center;gap:12px;
+  padding:0 16px;flex-shrink:0;
+  background:var(--surface);border-top:1px solid var(--border);font-size:11px;
+}
+#prog-wrap{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
+#prog-bar{height:100%;background:var(--indigo);width:0%;transition:width .15s;border-radius:2px}
+#prog-bar.p-pass{background:var(--green)}
+#prog-bar.p-fail{background:var(--red)}
+#ft-info{color:var(--tx-dim);white-space:nowrap}
+#ft-dur {color:var(--tx-muted);white-space:nowrap}
+
+/* ── REPORT view ────────────────────────────────────── */
+#main-report{display:none;flex:1;overflow:hidden;flex-direction:column}
+#report-header{
+  padding:24px 32px 0;flex-shrink:0;
+}
+.rh-row{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.rh-badge{
+  padding:6px 16px;border-radius:6px;font-size:13px;font-weight:700;letter-spacing:.05em;
+}
+.rh-pass{background:var(--green-bg);color:var(--green);border:1px solid var(--green-dim)}
+.rh-fail{background:var(--red-bg);color:var(--red);border:1px solid var(--red-dim)}
+.rh-stats{display:flex;gap:24px;flex:1}
+.rh-stat{text-align:center}
+.rh-stat .val{font-size:22px;font-weight:700;color:var(--tx);display:block}
+.rh-stat .lbl{font-size:11px;color:var(--tx-dim);display:block}
+.rh-actions{display:flex;gap:8px;margin-left:auto}
+#report-scroll{flex:1;overflow-y:auto;padding:0 32px 32px}
+#report-scroll::-webkit-scrollbar{width:6px}
+#report-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* Report suite card */
+.r-suite{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;margin-bottom:12px;overflow:hidden;
+}
+.r-suite-hdr{
+  display:flex;align-items:center;gap:12px;padding:14px 18px;
+  border-bottom:1px solid var(--border);
+}
+.r-si{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
+.r-si-pass{background:var(--green-bg);color:var(--green);border:1px solid var(--green-dim)}
+.r-si-fail{background:var(--red-bg);color:var(--red);border:1px solid var(--red-dim)}
+.r-suite-name{font-size:14px;font-weight:600;flex:1}
+.r-suite-meta{font-size:12px;color:var(--tx-dim)}
+.r-steps{padding:12px 18px;display:flex;flex-wrap:wrap;gap:8px}
+.r-step{
+  display:flex;align-items:center;gap:6px;padding:5px 10px;
+  border-radius:4px;font-size:12px;
+}
+.r-step.rs-pass{background:#0a1f14;color:var(--green);border:1px solid #1a4a30}
+.r-step.rs-fail{background:#1a0508;color:var(--red);border:1px solid #4a1020}
+.r-step-dur{font-size:10px;opacity:.7;margin-left:2px}
+
+/* Screenshot section in report */
+.r-screenshots{padding:12px 18px;display:flex;flex-wrap:wrap;gap:10px;border-top:1px solid var(--border)}
+.r-scr-label{font-size:11px;font-weight:600;color:var(--tx-dim);width:100%;margin-bottom:4px;letter-spacing:.05em}
+.r-scr{
+  position:relative;border:1px solid var(--border2);border-radius:6px;overflow:hidden;
+  cursor:pointer;transition:border-color .12s;
+}
+.r-scr:hover{border-color:var(--indigo)}
+.r-scr img{display:block;height:90px;width:auto;max-width:160px;object-fit:contain;background:#000}
+.r-scr-name{
+  position:absolute;bottom:0;left:0;right:0;background:#000000cc;
+  font-size:10px;color:#fff;padding:3px 6px;text-align:center;
+}
+.r-scr-dl{
+  position:absolute;top:4px;right:4px;background:#000000aa;border:none;cursor:pointer;
+  color:#fff;border-radius:3px;font-size:10px;padding:2px 5px;display:none;
+}
+.r-scr:hover .r-scr-dl{display:block}
+
+/* Video section in report */
+.r-video{padding:12px 18px;border-top:1px solid var(--border)}
+.r-video-label{font-size:11px;font-weight:600;color:var(--tx-dim);margin-bottom:8px;letter-spacing:.05em}
+.r-video-inner{display:flex;align-items:center;gap:12px}
+.r-video video{border:1px solid var(--border2);border-radius:6px;max-height:120px;max-width:220px;background:#000}
+.r-video-meta{font-size:12px;color:var(--tx-dim)}
+.r-video-meta span{display:block;margin-bottom:4px}
+.r-dl-btn{
+  padding:6px 12px;border-radius:var(--r);background:var(--surface3);color:var(--tx-dim);
+  border:1px solid var(--border2);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;
+}
+.r-dl-btn:hover{background:var(--surface2);color:var(--tx)}
+
+/* Divider */
+.r-divider{height:1px;background:var(--border);margin:4px 0}
+
+/* Screenshot modal */
+#scr-modal{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;flex-direction:column;gap:16px;
+}
+#scr-modal.open{display:flex}
+#scr-modal img{
+  max-width:90vw;max-height:75vh;border-radius:8px;
+  border:1px solid var(--border2);box-shadow:0 24px 64px #000a;
+  object-fit:contain;background:#000;
+}
+#scr-modal-bar{display:flex;align-items:center;gap:10px}
+#scr-modal-name{font-size:13px;color:var(--tx-dim);max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#scr-modal-close{
+  position:fixed;top:18px;right:22px;background:none;border:none;cursor:pointer;
+  font-size:22px;color:var(--tx-dim);line-height:1;transition:color .12s;
+}
+#scr-modal-close:hover{color:var(--tx)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── Header ───────────────────────────────────────── -->
+<div id="hdr">
+  <div id="hdr-left">
+    <span class="logo-chip">EGM E2E</span>
+    <span class="hdr-proj">Cut the Rope</span>
+  </div>
+  <div id="hdr-status">
+    <div class="hdr-rec">
+      <div class="rec-indicator" id="rec-dot"></div>
+      <span id="rec-lbl" style="display:none;font-size:11px">Recording</span>
+    </div>
+    <span class="status-pill sp-idle" id="status-pill">IDLE</span>
+  </div>
+  <div id="hdr-actions">
+    <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx-dim);cursor:pointer">
+      <input type="checkbox" id="chk-record" style="accent-color:var(--red)"> Record
+    </label>
+    <button class="hbtn hbtn-primary" id="btn-run"  onclick="runAll()">Run All</button>
+    <button class="hbtn hbtn-ghost"   id="btn-stop" onclick="stopRun()" disabled>Stop</button>
+    <button class="hbtn hbtn-ghost"   id="btn-report" onclick="showReport()" style="display:none">Report</button>
+  </div>
+</div>
+
+<!-- ── Running view ──────────────────────────────────── -->
+<div id="main-run">
+  <div id="game-pane">
+    <div id="gp-header">
+      <span class="gp-lbl">PREVIEW</span>
+      <span class="gp-info">360 × 640</span>
+      <span class="gp-rec-badge" id="gp-rec">● REC</span>
+    </div>
+    <div id="gp-wrap">
+      <div id="gf-box">
+        <iframe id="game-frame" src="/" width="360" height="640"
+          allow="autoplay" scrolling="no" style="display:block;border:none"></iframe>
+        <div id="ev-overlay"></div>
+        <div id="cursor-dot"></div>
+      </div>
+    </div>
+  </div>
+  <div id="test-pane">
+    <div id="tp-header">
+      <span class="tp-lbl">TESTS</span>
+      <span class="tp-count" id="tp-count">—</span>
+    </div>
+    <div id="test-scroll"></div>
+  </div>
+</div>
+
+<!-- ── Report view ───────────────────────────────────── -->
+<div id="main-report">
+  <div id="report-header">
+    <div class="rh-row">
+      <span class="rh-badge" id="rh-badge">—</span>
+      <div class="rh-stats" id="rh-stats"></div>
+      <div class="rh-actions">
+        <button class="hbtn hbtn-primary" onclick="runAll()">Run Again</button>
+        <button class="hbtn hbtn-ghost"   onclick="backToRunner()">Live View</button>
+      </div>
+    </div>
+    <div class="r-divider" style="margin-bottom:0"></div>
+  </div>
+  <div id="report-scroll"></div>
+</div>
+
+<!-- Footer -->
+<div id="footer">
+  <div id="prog-wrap"><div id="prog-bar"></div></div>
+  <span id="ft-info">Ready</span>
+  <span id="ft-dur">—</span>
+</div>
+
+</div><!-- #app -->
+
+<!-- ── Screenshot preview modal ──────────────────── -->
+<div id="scr-modal" onclick="if(event.target===this)closeScrModal()">
+  <button id="scr-modal-close" onclick="closeScrModal()">✕</button>
+  <img id="scr-modal-img" src="" alt="">
+  <div id="scr-modal-bar">
+    <span id="scr-modal-name"></span>
+    <button class="r-dl-btn" id="scr-modal-dl">⬇ Download</button>
+  </div>
+</div>
+
+<!-- ── Test registration shim (runs before test scripts) ── -->
+<script>
+window.__egmE2eTests = [];
+// "var test" makes test() a global accessible from all subsequent <script> tags
+var test = function(name, fn) {
+  window.__egmE2eTests.push({ name: name, fn: fn });
+};
+</script>
+
+<!-- ── Transpiled E2E test scripts (inline, no module imports needed) ── -->
+<!-- src/e2e/game.e2e.ts -->
+<script>
+test("Menu navigates to game", async ({ game }) => {
+  await game.wait(1e3);
+  await game.screenshot("menu-ready");
+  await game.tap(171, 464);
+  await game.expect.scene("game");
+  await game.screenshot("game-started");
+});
+test("Cut ropes and feed candy to Om Nom", async ({ game }) => {
+  await game.wait(1e3);
+  await game.tap(171, 464);
+  await game.expect.scene("game");
+  await game.wait(7563);
+  await game.screenshot("before-first-cut");
+  await game.drag(122, 148, 231, 133, { duration: 295 });
+  await game.wait(10263);
+  await game.screenshot("before-second-cut");
+  await game.drag(258, 324, 358, 355, { duration: 254 });
+  await game.expect.state(
+    (win) => {
+      const state = win.__EGM_APP__?.scenes?.current?._state;
+      return state === "eating" || state === "lost";
+    },
+    "Candy should reach Om Nom or fall off screen after ropes are cut",
+    { timeout: 8e3 }
+  );
+  await game.screenshot("after-second-cut");
+});
+
+</script>
+
+<script type="module">
+// ── Test registry already populated by inline scripts above ─
+
+function loadTests() {
+  // Tests are registered synchronously by inline <script> tags above.
+  // Each script calls window.__egmTest(name, fn) which pushes to __egmE2eTests.
+  const tests = window.__egmE2eTests || [];
+  console.log('[EGM E2E] Tests available:', tests.length, tests.map(function(t){return t.name;}));
+  return Promise.resolve(tests);
+}
+
+// ── State ────────────────────────────────────────────
+let _stop = false, _startMs = 0, _done = 0, _total = 0;
+let _screenshots = [];  // {name, dataUrl, testIdx}
+let _videoBlob   = null;
+let _videoDurMs  = 0;
+let _recorder    = null;
+let _recChunks   = [];
+let _testResults = []; // {name, status, durationMs, steps:[{name,detail,status,durationMs,err}], screenshots}
+
+// ── Helpers ──────────────────────────────────────────
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function escH(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function getCanvas(iframe){
+  const c = iframe.contentDocument?.querySelector('canvas');
+  if(!c) throw new Error('Canvas not found');
+  return c;
+}
+
+/**
+ * Inject a __egmDispatch helper into the iframe so pointer events are always
+ * dispatched from the iframe's own JS context (avoids cross-frame coordinate
+ * and instanceof edge-cases).
+ */
+function injectHelper(iframe){
+  // IMPORTANT: __egmDispatch is DEFINED in parent-frame JS, so 'window'/'document'
+  // inside it refer to the PARENT's globals. We must use 'this' (=iframeWin, set by
+  // fptr via .call(iframeWin, ...)) to access the iframe's globals.
+  try{
+    iframe.contentWindow.__egmDispatch = function(type, cx, cy){
+      var self = this;  // = iframeWin (set by fptr via fn.call(iframeWin,...))
+      // Primary path: direct InputManager.emit — game coordinates, no DOM events.
+      var app = self.__EGM_APP__;
+      if(app && app.input && typeof app.input.emit === 'function'){
+        app.input.emit(type, {x:cx, y:cy, pointerId:1});
+        if(type==='pointerdown'){ app.input._pointerDown=true;  app.input._pointerX=cx; app.input._pointerY=cy; }
+        else if(type==='pointerup'  ){ app.input._pointerDown=false; app.input._pointerX=cx; app.input._pointerY=cy; }
+        else if(type==='pointermove'){ app.input._pointerX=cx; app.input._pointerY=cy; }
+        return;
+      }
+      // Fallback: canvas PointerEvent (uses self.document / self.PointerEvent).
+      var c = self.document.querySelector('canvas');
+      if(!c){ self.console.warn('[E2E] canvas not found'); return; }
+      c.dispatchEvent(new self.PointerEvent(type,{
+        bubbles:true, cancelable:true, pointerId:1, isPrimary:true,
+        clientX:cx, clientY:cy, pressure:(type==='pointerup'?0:0.5)
+      }));
+    };
+  } catch(e){ console.warn('[E2E] inject failed',e); }
+}
+
+/**
+ * Convert game coordinates to clientX/clientY values for the iframe context.
+ *
+ * When __egmDispatch is used (dispatches from inside the iframe), clientX/clientY
+ * are in iframe-local viewport coords. The canvas fills the iframe at its natural
+ * size with no CSS scaling, so game coords map 1:1 to iframe clientX/clientY.
+ *
+ * Fallback (direct dispatchEvent from parent): multiply by the CSS scale factor
+ * (iframe rendered size / game resolution) so the event lands at the right spot.
+ */
+function g2c(canvas, gx, gy, iframeEl){
+  const iframe = iframeEl || document.getElementById('game-frame');
+  if(iframe.contentWindow && iframe.contentWindow.__egmDispatch){
+    // Runs inside iframe: game coords = iframe-local clientX/clientY
+    return { cx: gx, cy: gy };
+  }
+  // Fallback: scale by CSS-rendered iframe size vs game resolution
+  const iframeR = iframe.getBoundingClientRect();
+  const sx = iframeR.width  / (canvas.width  || 1);
+  const sy = iframeR.height / (canvas.height || 1);
+  return { cx: gx * sx, cy: gy * sy };
+}
+
+/**
+ * Convert game coords to #gf-box-relative CSS pixels for overlay elements.
+ * Both iframeR and boxR are in parent-viewport coords → subtraction is valid.
+ * canvas.getBoundingClientRect() from the parent frame returns IFRAME-local coords
+ * (top-left ≈ 0,0), so we use the <iframe> element rect instead.
+ */
+function overlayPos(canvas, gx, gy){
+  const iframe  = document.getElementById('game-frame');
+  const iframeR = iframe.getBoundingClientRect();  // parent-viewport
+  const boxR    = document.getElementById('gf-box').getBoundingClientRect();  // parent-viewport
+  const sx = iframeR.width  / (canvas.width  || 1);
+  const sy = iframeR.height / (canvas.height || 1);
+  return {
+    ox: (iframeR.left - boxR.left) + gx * sx,
+    oy: (iframeR.top  - boxR.top)  + gy * sy,
+  };
+}
+
+/** Dispatch via iframe-injected helper when available, else direct dispatchEvent. */
+function fptr(canvas, type, cx, cy, iframeWin){
+  const fn = iframeWin && iframeWin.__egmDispatch;
+  if(fn){ fn.call(iframeWin, type, cx, cy); return; }
+  const PE = (iframeWin || window).PointerEvent || window.PointerEvent;
+  canvas.dispatchEvent(new PE(type,{
+    bubbles:true, cancelable:true, pointerId:1, isPrimary:true,
+    clientX:cx, clientY:cy, pressure:type==='pointerup'?0:0.5,
+  }));
+}
+
+function moveCursor(gx, gy, iframe){
+  const canvas  = getCanvas(iframe);
+  const {ox,oy} = overlayPos(canvas, gx, gy);
+  const dot = document.getElementById('cursor-dot');
+  dot.style.display='block';
+  dot.style.left = ox+'px';
+  dot.style.top  = oy+'px';
+}
+function hideCursor(){ document.getElementById('cursor-dot').style.display='none'; }
+
+/** Show a yellow ripple burst at the tapped game coordinate. */
+function showRipple(gx, gy, iframe){
+  try{
+    const canvas  = getCanvas(iframe);
+    const {ox,oy} = overlayPos(canvas, gx, gy);
+    const overlay = document.getElementById('ev-overlay');
+    const r = document.createElement('div');
+    r.className = 'ev-ripple';
+    r.style.left = ox+'px';
+    r.style.top  = oy+'px';
+    overlay.appendChild(r);
+    setTimeout(function(){ try{ r.remove(); }catch{} }, 900);
+  }catch{}
+}
+
+/** Draw an orange dashed arrow from start to end of a drag gesture. */
+function showDragPath(x1, y1, x2, y2, iframe){
+  try{
+    const canvas  = getCanvas(iframe);
+    const p1 = overlayPos(canvas, x1, y1);
+    const p2 = overlayPos(canvas, x2, y2);
+    const overlay = document.getElementById('ev-overlay');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('style','position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible');
+    const dx=p2.ox-p1.ox, dy=p2.oy-p1.oy, len=Math.sqrt(dx*dx+dy*dy)||1;
+    const nx=dx/len, ny=dy/len, hs=8;
+    svg.innerHTML=
+      '<line x1="'+p1.ox+'" y1="'+p1.oy+'" x2="'+p2.ox+'" y2="'+p2.oy+'" stroke="rgba(255,160,50,.8)" stroke-width="2" stroke-dasharray="5,3"/>'+
+      '<polygon points="'+
+        (p2.ox)+','+(p2.oy)+' '+
+        (p2.ox-hs*nx+hs*.5*ny)+','+(p2.oy-hs*ny-hs*.5*nx)+' '+
+        (p2.ox-hs*nx-hs*.5*ny)+','+(p2.oy-hs*ny+hs*.5*nx)+
+      '" fill="rgba(255,160,50,.85)"/>'+
+      '<circle cx="'+p1.ox+'" cy="'+p1.oy+'" r="4" fill="rgba(255,220,50,.9)"/>';
+    overlay.appendChild(svg);
+    setTimeout(function(){ try{ svg.remove(); }catch{} }, 3500);
+  }catch{}
+}
+
+// ── Game Fixture ─────────────────────────────────────
+function createFixture(iframe){
+  const gw = iframe.contentWindow;
+  return {
+    async tap(x,y){
+      moveCursor(x,y,iframe);
+      const canvas=getCanvas(iframe);
+      const {cx,cy}=g2c(canvas,x,y,iframe);
+      fptr(canvas,'pointerdown',cx,cy,gw);
+      showRipple(x,y,iframe);
+      await sleep(80);
+      fptr(canvas,'pointerup',cx,cy,gw);
+      await sleep(60); hideCursor();
+    },
+    async drag(x1,y1,x2,y2,opts={}){
+      const dur=opts.duration??400, steps=opts.steps??22;
+      const canvas=getCanvas(iframe);
+      const c1=g2c(canvas,x1,y1,iframe), c2=g2c(canvas,x2,y2,iframe);
+      moveCursor(x1,y1,iframe);
+      fptr(canvas,'pointerdown',c1.cx,c1.cy,gw);
+      await sleep(20);
+      for(let i=0;i<=steps;i++){
+        const t=i/steps;
+        fptr(canvas,'pointermove',c1.cx+(c2.cx-c1.cx)*t,c1.cy+(c2.cy-c1.cy)*t,gw);
+        moveCursor(x1+(x2-x1)*t,y1+(y2-y1)*t,iframe);
+        await sleep(dur/steps);
+      }
+      showDragPath(x1,y1,x2,y2,iframe);
+      fptr(canvas,'pointerup',c2.cx,c2.cy,gw); hideCursor();
+    },
+    async key(key,opts={}){
+      const hold=opts.hold??50;
+      const fire=function(t){gw.dispatchEvent(new KeyboardEvent(t,{key,bubbles:true,cancelable:true}));};
+      fire('keydown'); await sleep(hold); fire('keyup'); await sleep(30);
+    },
+    async wait(ms){ await sleep(ms); },
+    async screenshot(name){
+      const canvas=getCanvas(iframe);
+      const data=canvas.toDataURL('image/png');
+      _screenshots.push({name:name||('scr_'+Date.now()),dataUrl:data});
+      return data;
+    },
+    expect: {
+      async scene(name, opts){
+        // Retry every 200ms up to timeout (default 6s) — Cypress-style polling
+        const timeout=(opts&&opts.timeout!=null?opts.timeout:6000);
+        const deadline=Date.now()+timeout;
+        let actual;
+        while(true){
+          actual = iframe.contentWindow && iframe.contentWindow.__egmScene;
+          if(actual===name) return;
+          if(Date.now()>=deadline) break;
+          await sleep(200);
+        }
+        throw new Error('Expected scene "'+name+'", got "'+(actual||'unknown')+'" (waited '+timeout+'ms)');
+      },
+      async state(fn, msg, opts){
+        const timeout=(opts&&opts.timeout!=null?opts.timeout:6000);
+        const deadline=Date.now()+timeout;
+        while(true){
+          try{ const ok=await fn(iframe.contentWindow); if(ok) return; }catch{}
+          if(Date.now()>=deadline) break;
+          await sleep(200);
+        }
+        throw new Error(msg||'State assertion failed (waited '+timeout+'ms)');
+      },
+    },
+  };
+}
+
+// ── Video recording ──────────────────────────────────
+let _recStartMs = 0;
+
+async function startVideoRecording(iframe){
+  _recChunks=[]; _videoBlob=null;
+  // Canvas is already loaded (sleep(600) ran before this call)
+  const canvas=iframe.contentDocument?.querySelector('canvas');
+  if(!canvas){ console.warn('[E2E] Canvas not found, skipping recording'); return; }
+  try{
+    const stream=canvas.captureStream(30);
+    const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+      ? 'video/webm;codecs=vp9' : 'video/webm';
+    _recorder=new MediaRecorder(stream,{mimeType:mime});
+    _recorder.ondataavailable=e=>{if(e.data.size>0)_recChunks.push(e.data);};
+    _recorder.start(100);
+    _recStartMs=Date.now();
+    document.getElementById('rec-dot').classList.add('active');
+    document.getElementById('rec-lbl').style.display='inline';
+    document.getElementById('gp-rec').classList.add('active');
+  } catch(err){
+    console.warn('[E2E] Recording failed:', err);
+    _recorder=null;
+  }
+}
+
+function stopVideoRecording(){
+  return new Promise(resolve=>{
+    if(!_recorder){resolve();return;}
+    _recorder.onstop=()=>{
+      _videoBlob=new Blob(_recChunks,{type:'video/webm'});
+      _videoDurMs=Date.now()-_recStartMs;
+      resolve();
+    };
+    _recorder.stop();
+    _recorder=null;
+    document.getElementById('rec-dot').classList.remove('active');
+    document.getElementById('rec-lbl').style.display='none';
+    document.getElementById('gp-rec').classList.remove('active');
+  });
+}
+
+// ── UI helpers ────────────────────────────────────────
+function setStatus(cls,lbl){
+  const p=document.getElementById('status-pill');
+  p.className='status-pill sp-'+cls; p.textContent=lbl;
+}
+function updateProgress(){
+  const pct=_total?(_done/_total)*100:0;
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('ft-info').textContent=_done+' / '+_total+' steps';
+  const ms=Date.now()-_startMs;
+  document.getElementById('ft-dur').textContent=ms<1000?ms+'ms':(ms/1000).toFixed(2)+'s';
+}
+
+// ── Suite + step elements ─────────────────────────────
+function buildSuiteEl(name,idx){
+  const d=document.createElement('div'); d.className='suite'; d.id='suite-'+idx;
+  d.innerHTML=
+    '<div class="suite-hdr" onclick="toggleSuite('+idx+')">' +
+      '<div class="si si-idle" id="si-'+idx+'">○</div>' +
+      '<span class="suite-name">'+escH(name)+'</span>' +
+      '<span class="suite-stat" id="ss-'+idx+'"></span>' +
+      '<span class="suite-dur"  id="sd-'+idx+'"></span>' +
+    '</div>' +
+    '<div class="steps open" id="steps-'+idx+'"></div>';
+  return d;
+}
+
+function buildStepEl(name,detail){
+  const isAssert = name==='assert';
+  const d=document.createElement('div');
+  d.className='step s-idle'+(isAssert?' s-assert':'');
+  d.innerHTML=
+    '<span class="sicon">'+(isAssert?'◎':'○')+'</span>' +
+    '<div class="s-body">' +
+      '<div class="s-name">'+escH(name)+'</div>' +
+      (detail?'<div class="s-detail">'+escH(detail)+'</div>':'') +
+    '</div>' +
+    '<span class="s-dur"></span>';
+  return d;
+}
+
+function stepState(el,state,dur,err){
+  const icons={idle:'○',running:'▶',passed:'✓',failed:'✗'};
+  el.className='step s-'+state;
+  el.querySelector('.sicon').textContent=icons[state]??'○';
+  if(dur!=null) el.querySelector('.s-dur').textContent=dur+'ms';
+  if(err){ const e=document.createElement('div'); e.className='s-err'; e.textContent=err; el.querySelector('.s-body').appendChild(e); }
+}
+
+function suiteState(idx,state,dur,passed,failed){
+  const si=document.getElementById('si-'+idx);
+  si.className='si si-'+state;
+  const icons={idle:'○',running:'▶',passed:'✓',failed:'✗'};
+  si.textContent=icons[state]??'○';
+  if(dur!=null) document.getElementById('sd-'+idx).textContent=dur+'ms';
+  if(passed!=null||failed!=null){
+    const parts=[];
+    if(passed) parts.push('<span style="color:var(--green)">'+passed+' passed</span>');
+    if(failed) parts.push('<span style="color:var(--red)">'+failed+' failed</span>');
+    document.getElementById('ss-'+idx).innerHTML=parts.join('&nbsp;');
+  }
+}
+
+window.toggleSuite=function(idx){
+  document.getElementById('steps-'+idx).classList.toggle('open');
+};
+
+// ── Instrumented fixture ──────────────────────────────
+function wrapFixture(real, stepsContainer, testResultSteps){
+  function add(name,detail,fn){
+    const el=buildStepEl(name,detail);
+    stepsContainer.appendChild(el);
+    const stepRec={name,detail,status:'idle',durationMs:0,err:null};
+    testResultSteps.push(stepRec);
+    _total++; updateProgress();
+    return async()=>{
+      const t0=Date.now();
+      stepState(el,'running');
+      el.scrollIntoView({behavior:'smooth',block:'nearest'});
+      try{
+        await fn();
+        const dur=Date.now()-t0;
+        stepState(el,'passed',dur);
+        stepRec.status='passed'; stepRec.durationMs=dur;
+        _done++; updateProgress();
+        return{ok:true};
+      }catch(err){
+        const dur=Date.now()-t0, msg=err?.message??String(err);
+        stepState(el,'failed',dur,msg);
+        stepRec.status='failed'; stepRec.durationMs=dur; stepRec.err=msg;
+        _done++; updateProgress();
+        return{ok:false,err:msg};
+      }
+    };
+  }
+  const w={_runners:[]};
+  w.tap=(x,y,o)=>{ w._runners.push(add('tap','('+x+', '+y+')',()=>real.tap(x,y,o))); return Promise.resolve(); };
+  w.drag=(x1,y1,x2,y2,o)=>{ const dur=(o?.duration??400); w._runners.push(add('drag','('+x1+','+y1+') → ('+x2+','+y2+')  '+dur+'ms',()=>real.drag(x1,y1,x2,y2,o))); return Promise.resolve(); };
+  w.key=(k,o)=>{ w._runners.push(add('key',k,()=>real.key(k,o))); return Promise.resolve(); };
+  w.wait=(ms)=>{ w._runners.push(add('wait',ms+'ms',()=>real.wait(ms))); return Promise.resolve(); };
+  w.screenshot=(n)=>{ w._runners.push(add('screenshot',n??'',()=>real.screenshot(n))); return Promise.resolve(); };
+  w.expect={
+    scene:(name)=>{ w._runners.push(add('assert','scene = "'+name+'"',()=>real.expect.scene(name))); return Promise.resolve(); },
+    state:(fn,msg)=>{ w._runners.push(add('assert',msg||'state check',()=>real.expect.state(fn,msg))); return Promise.resolve(); },
+  };
+  return w;
+}
+
+// ── Run all ───────────────────────────────────────────
+window.runAll = async function(){
+  try {
+  _stop=false; _startMs=Date.now(); _done=0; _total=0;
+  _screenshots=[]; _videoBlob=null; _recChunks=[];
+  _testResults=[];
+
+  document.getElementById('prog-bar').className='';
+  document.getElementById('prog-bar').style.width='0%';
+
+  // Switch to running view
+  document.getElementById('main-report').style.display='none';
+  document.getElementById('main-run').style.display='flex';
+  document.getElementById('btn-report').style.display='none';
+  document.getElementById('btn-run').disabled=true;
+  document.getElementById('btn-stop').disabled=false;
+
+  setStatus('running','LOADING...');
+
+  let tests;
+  try {
+    tests=await loadTests();
+  } catch(err) {
+    setStatus('failed','ERROR');
+    document.getElementById('btn-run').disabled=false;
+    document.getElementById('btn-stop').disabled=true;
+    return;
+  }
+
+  if(!tests.length){
+    setStatus('idle','NO TESTS');
+    document.getElementById('test-scroll').innerHTML=
+      '<div style="padding:20px 16px;color:var(--tx-dim);font-size:12px">'+
+      'No E2E tests found.<br><span style="opacity:.6">Create a test in <code>src/e2e/*.e2e.ts</code></span></div>';
+    document.getElementById('btn-run').disabled=false;
+    document.getElementById('btn-stop').disabled=true;
+    return;
+  }
+
+  document.getElementById('tp-count').textContent=tests.length+' suite'+(tests.length!==1?'s':'');
+  const scroll=document.getElementById('test-scroll');
+  scroll.innerHTML='';
+  tests.forEach((t,i)=>scroll.appendChild(buildSuiteEl(t.name,i)));
+
+  setStatus('running','RUNNING');
+
+  const iframe=document.getElementById('game-frame');
+  const doRecord=document.getElementById('chk-record').checked;
+  let totalPass=0,totalFail=0;
+
+  for(let i=0;i<tests.length;i++){
+    if(_stop) break;
+    const t=tests[i], t0=Date.now();
+    const steps=[]; _testResults.push({name:t.name,status:'running',durationMs:0,steps,screenshots:[]});
+    suiteState(i,'running');
+
+    // Fresh game state for every test
+    if(doRecord && i>0) await stopVideoRecording();  // save previous test's video
+    iframe.src=iframe.src;
+    await new Promise(function(r){iframe.onload=r;});
+    injectHelper(iframe);
+    await sleep(600);
+    if(doRecord) await startVideoRecording(iframe);  // fresh recording per test
+    // Clear visual overlay from previous test
+    const ov=document.getElementById('ev-overlay'); if(ov) ov.innerHTML='';
+
+    const stepsEl=document.getElementById('steps-'+i);
+    const real=createFixture(iframe);
+    const wrapped=wrapFixture(real,stepsEl,steps);
+
+    try{ await t.fn({game:wrapped}); }catch{}
+
+    let sp=0,sf=0;
+    for(const run of wrapped._runners){
+      if(_stop) break;
+      const res=await run();
+      if(res.ok)sp++;else sf++;
+    }
+
+    const dur=Date.now()-t0;
+    const ok=sf===0&&!_stop;
+    suiteState(i,ok?'passed':'failed',dur,sp,sf);
+    _testResults[i].status=ok?'passed':'failed';
+    _testResults[i].durationMs=dur;
+    // Screenshots taken during this test
+    const prevCount=totalPass+totalFail;
+    _testResults[i].screenshots=[..._screenshots].slice(prevCount);
+    totalPass+=sp; totalFail+=sf;
+
+    // Stop and attach video for this test
+    if(doRecord){
+      await stopVideoRecording();
+      _testResults[i].video=_videoBlob;
+      _testResults[i].videoDurMs=_videoDurMs;
+    }
+  }
+
+  const allOk=totalFail===0&&!_stop;
+  const bar=document.getElementById('prog-bar');
+  bar.className=allOk?'p-pass':'p-fail'; bar.style.width='100%';
+  setStatus(allOk?'passed':'failed',allOk?'PASSED':'FAILED');
+
+  document.getElementById('btn-run').disabled=false;
+  document.getElementById('btn-stop').disabled=true;
+  document.getElementById('btn-report').style.display='';
+  updateProgress();
+
+  // Show report after brief delay
+  await sleep(400);
+  buildReport(allOk,totalPass,totalFail,Date.now()-_startMs);
+  window.showReport();
+
+  } catch(err) {
+    // Outer safety net — should never reach here
+    console.error('[EGM E2E] Unexpected error in runAll:', err);
+    setStatus('failed','ERROR');
+    document.getElementById('btn-run').disabled=false;
+    document.getElementById('btn-stop').disabled=true;
+  }
+};
+
+window.stopRun=function(){
+  _stop=true;
+  stopVideoRecording();
+  setStatus('stopped','STOPPED');
+  document.getElementById('btn-run').disabled=false;
+  document.getElementById('btn-stop').disabled=true;
+  hideCursor();
+};
+
+// ── Report ────────────────────────────────────────────
+function buildReport(allOk,totalPass,totalFail,totalMs){
+  const badge=document.getElementById('rh-badge');
+  badge.className='rh-badge '+(allOk?'rh-pass':'rh-fail');
+  badge.textContent=allOk?'PASSED':'FAILED';
+
+  const stats=document.getElementById('rh-stats');
+  const suites=_testResults.length;
+  stats.innerHTML=
+    '<div class="rh-stat"><span class="val" style="color:var(--green)">'+totalPass+'</span><span class="lbl">passed</span></div>'+
+    (totalFail?'<div class="rh-stat"><span class="val" style="color:var(--red)">'+totalFail+'</span><span class="lbl">failed</span></div>':'')+
+    '<div class="rh-stat"><span class="val">'+suites+'</span><span class="lbl">suites</span></div>'+
+    '<div class="rh-stat"><span class="val">'+fmtMs(totalMs)+'</span><span class="lbl">duration</span></div>';
+
+  const scroll=document.getElementById('report-scroll');
+  scroll.innerHTML='';
+
+  _testResults.forEach(function(res){
+    const card=document.createElement('div'); card.className='r-suite';
+    const ok=res.status==='passed';
+    const passed=res.steps.filter(s=>s.status==='passed').length;
+    const failed=res.steps.filter(s=>s.status==='failed').length;
+
+    let html=
+      '<div class="r-suite-hdr">'+
+        '<div class="r-si '+(ok?'r-si-pass':'r-si-fail')+'">'+(ok?'✓':'✗')+'</div>'+
+        '<span class="r-suite-name">'+escH(res.name)+'</span>'+
+        '<span class="r-suite-meta">'+
+          (passed?'<span style="color:var(--green)">'+passed+' passed</span> ':'') +
+          (failed?'<span style="color:var(--red)">'+failed+' failed</span> ':'') +
+          '&nbsp;'+fmtMs(res.durationMs)+
+        '</span>'+
+      '</div>'+
+      '<div class="r-steps">';
+
+    res.steps.forEach(function(s){
+      const sc=s.status==='passed'?'rs-pass':'rs-fail';
+      html+='<div class="r-step '+sc+'">'+
+        (s.status==='passed'?'✓':'✗')+
+        ' <span>'+escH(s.name)+'</span>'+
+        (s.detail?'<span style="opacity:.6;font-size:10px"> '+escH(s.detail)+'</span>':'')+
+        '<span class="r-step-dur">'+s.durationMs+'ms</span>'+
+        '</div>';
+      if(s.err) html+='<div style="width:100%;background:#1a0508;color:var(--red);font-size:11px;padding:6px 10px;border-radius:4px;border:1px solid #4a1020;white-space:pre-wrap;word-break:break-all">'+escH(s.err)+'</div>';
+    });
+    html+='</div>';
+
+    // Screenshots
+    if(res.screenshots&&res.screenshots.length){
+      html+='<div class="r-screenshots"><div class="r-scr-label">SCREENSHOTS</div>';
+      res.screenshots.forEach(function(scr,si){
+        html+=
+          '<div class="r-scr" onclick="dlScr('+_testResults.indexOf(res)+','+si+')">'+
+          '<img src="'+scr.dataUrl+'" alt="'+escH(scr.name)+'">'+
+          '<span class="r-scr-name">'+escH(scr.name)+'</span>'+
+          '</div>';
+      });
+      html+='</div>';
+    }
+
+    // Per-test video — store URL in global array to avoid quote-escaping in onclick
+    if(res.video){
+      const vidIdx=window.__e2eVids.length;
+      window.__e2eVids.push({url:URL.createObjectURL(res.video), name:res.name});
+      const sizeMB=(res.video.size/1024/1024).toFixed(1);
+      html+='<div class="r-video">'+
+        '<div class="r-video-label">RECORDING</div>'+
+        '<div class="r-video-inner">'+
+          '<video src="'+window.__e2eVids[vidIdx].url+'" controls></video>'+
+          '<div class="r-video-meta">'+
+            '<span>Duration: '+fmtMs(res.videoDurMs||0)+'</span>'+
+            '<span>Size: '+sizeMB+' MB</span>'+
+          '</div>'+
+          '<button class="r-dl-btn" onclick="dlVid('+vidIdx+')">⬇ Download</button>'+
+        '</div>'+
+      '</div>';
+    }
+
+    card.innerHTML=html;
+    scroll.appendChild(card);
+  });
+}
+
+window.__e2eVids=[];
+
+window.dlScr=function(ti,si){
+  const scr=_testResults[ti]?.screenshots?.[si];
+  if(!scr) return;
+  const modal=document.getElementById('scr-modal');
+  const img=document.getElementById('scr-modal-img');
+  const name=document.getElementById('scr-modal-name');
+  const dlBtn=document.getElementById('scr-modal-dl');
+  img.src=scr.dataUrl;
+  name.textContent=scr.name;
+  dlBtn.onclick=function(){
+    const a=document.createElement('a');
+    a.href=scr.dataUrl; a.download=scr.name+'.png'; a.click();
+  };
+  modal.classList.add('open');
+};
+
+window.closeScrModal=function(){
+  document.getElementById('scr-modal').classList.remove('open');
+};
+
+// Close with Escape key
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') window.closeScrModal();
+});
+window.dlVid=function(idx){
+  const v=window.__e2eVids[idx]; if(!v) return;
+  const a=document.createElement('a'); a.href=v.url;
+  a.download=v.name+'.webm'; a.click();
+};
+
+window.showReport=function(){
+  document.getElementById('main-run').style.display='none';
+  document.getElementById('main-report').style.display='flex';
+  document.getElementById('main-report').style.flexDirection='column';
+};
+window.backToRunner=function(){
+  document.getElementById('main-report').style.display='none';
+  document.getElementById('main-run').style.display='flex';
+};
+
+function fmtMs(ms){
+  if(ms<1000) return ms+'ms';
+  return (ms/1000).toFixed(2)+'s';
+}
+
+// Auto-run — use window.runAll, not bare runAll (module scope vs global)
+setTimeout(function(){ if(window.__egmE2eAutoRun!==false) window.runAll(); }, 800);
+</script>
+</body>
+</html>

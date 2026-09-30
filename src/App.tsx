@@ -1,7 +1,20 @@
-import { Routes, Route } from 'react-router-dom'
+import type { ComponentType } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { LangProvider } from '@/context/LangContext'
+import { GameTypeProvider } from '@/context/GameTypeContext'
+import { SiteBackground } from '@/components/layout/SiteBackground'
+import { getPage } from '@/content/registry'
+import { ALL_ITEMS } from '@/data/navigation'
+import { ContentPage, PlaceholderPage } from '@/pages/ContentPage'
+import { ExamplesGallery } from '@/pages/examples/ExamplesGallery'
+import { ExampleDetail } from '@/pages/examples/ExampleDetail'
+import { getExample } from '@/data/examples'
 
 import { HomePage } from '@/pages/HomePage'
+import { NotFoundPage } from '@/pages/NotFoundPage'
+
+// Pages written before the content system. Each one is used only for the slugs it really documents; the content
+// registry always wins, so migrating a page is just adding a file under content/pages and deleting its line here.
 import { IntroductionPage } from '@/pages/docs/IntroductionPage'
 import { InstallationPage } from '@/pages/docs/InstallationPage'
 import { AppPage } from '@/pages/docs/AppPage'
@@ -19,79 +32,57 @@ import { VisualScenePage } from '@/pages/docs/VisualScenePage'
 import { CLIPage } from '@/pages/docs/CLIPage'
 import { SimulatorPage } from '@/pages/docs/SimulatorPage'
 import { BuildPage } from '@/pages/docs/BuildPage'
-import { NotFoundPage } from '@/pages/NotFoundPage'
+
+const LEGACY: Record<string, ComponentType> = {
+  '/introduction': IntroductionPage,
+  '/installation': InstallationPage,
+  '/core/app': AppPage,
+  '/core/scene': ScenePage,
+  '/camera': CameraPage,
+  '/visual-editor': VisualEditorPage,
+  '/core/visual-scene': VisualScenePage,
+  '/cli/editor': EditorPage,
+  ...Object.fromEntries(['new', 'simulate', 'build', 'test', 'e2e', 'go'].map((c) => [`/cli/${c}`, CLIPage])),
+  ...Object.fromEntries(
+    ['display-object', 'group', 'sprite', 'animated-sprite', 'rect-shape', 'circle-shape', 'line-shape', 'text', 'polygon-shape', 'particles'].map((p) => [`/display/${p}`, DisplayPage]),
+  ),
+  ...Object.fromEntries(['tween', 'easing', 'transitions'].map((p) => [`/animation/${p}`, AnimationPage])),
+  ...Object.fromEntries(['world', 'body'].map((p) => [`/physics/${p}`, PhysicsPage])),
+  ...Object.fromEntries(['keyboard-mouse', 'gamepad'].map((p) => [`/input/${p}`, InputPage])),
+  ...Object.fromEntries(['manager', 'room'].map((p) => [`/network/${p}`, NetworkPage])),
+  ...Object.fromEntries(['ads', 'iap'].map((p) => [`/monetization/${p}`, MonetizationPage])),
+  ...Object.fromEntries(['overview', 'devtools', 'tunnel', 'egmgo'].map((p) => [`/simulator/${p}`, SimulatorPage])),
+  ...Object.fromEntries(['web', 'mobile', 'desktop', 'tv', 'consoles'].map((p) => [`/build/${p}`, BuildPage])),
+}
+
+function PageResolver() {
+  const { pathname } = useLocation()
+  const slug = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+
+  const page = getPage(slug)
+  if (page) return <ContentPage page={page} />
+
+  if (slug === '/examples') return <ExamplesGallery />
+  const example = slug.startsWith('/examples/') ? getExample(slug.slice('/examples/'.length)) : undefined
+  if (example) return <ExampleDetail example={example} />
+
+  const Legacy = LEGACY[slug]
+  if (Legacy) return <Legacy />
+
+  if (ALL_ITEMS.some((i) => i.slug === slug)) return <PlaceholderPage slug={slug} />
+  return <NotFoundPage />
+}
 
 export default function App() {
   return (
     <LangProvider>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/introduction" element={<IntroductionPage />} />
-        <Route path="/installation" element={<InstallationPage />} />
-        <Route path="/first-game" element={<InstallationPage />} />
-        <Route path="/project-structure" element={<InstallationPage />} />
-        <Route path="/workflow" element={<IntroductionPage />} />
-
-        {/* Visual Editor */}
-        <Route path="/visual-editor" element={<VisualEditorPage />} />
-        <Route path="/core/visual-scene" element={<VisualScenePage />} />
-
-        {/* Core */}
-        <Route path="/core/app" element={<AppPage />} />
-        <Route path="/core/scene" element={<ScenePage />} />
-        <Route path="/core/assets" element={<AppPage />} />
-        <Route path="/core/events" element={<AppPage />} />
-        <Route path="/core/timer" element={<AppPage />} />
-        <Route path="/core/platform" element={<AppPage />} />
-
-        {/* Display */}
-        <Route path="/display/*" element={<DisplayPage />} />
-
-        {/* Math */}
-        <Route path="/math/*" element={<AppPage />} />
-
-        {/* Animation */}
-        <Route path="/animation/*" element={<AnimationPage />} />
-
-        {/* Camera */}
-        <Route path="/camera" element={<CameraPage />} />
-
-        {/* Physics */}
-        <Route path="/physics/*" element={<PhysicsPage />} />
-
-        {/* Input */}
-        <Route path="/input/*" element={<InputPage />} />
-
-        {/* Audio */}
-        <Route path="/audio/*" element={<AppPage />} />
-
-        {/* Network */}
-        <Route path="/network/*" element={<NetworkPage />} />
-
-        {/* Gameplay */}
-        <Route path="/gameplay/*" element={<AppPage />} />
-
-        {/* Shaders */}
-        <Route path="/shaders/*" element={<AppPage />} />
-
-        {/* Monetization */}
-        <Route path="/monetization/*" element={<MonetizationPage />} />
-
-        {/* Debug */}
-        <Route path="/debug/*" element={<AppPage />} />
-
-        {/* CLI */}
-        <Route path="/cli/*" element={<CLIPage />} />
-        <Route path="/cli/editor" element={<EditorPage />} />
-
-        {/* Simulator */}
-        <Route path="/simulator/*" element={<SimulatorPage />} />
-
-        {/* Build */}
-        <Route path="/build/*" element={<BuildPage />} />
-
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <GameTypeProvider>
+        <SiteBackground />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="*" element={<PageResolver />} />
+        </Routes>
+      </GameTypeProvider>
     </LangProvider>
   )
 }

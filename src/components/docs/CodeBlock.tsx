@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { highlight } from '@/lib/highlight'
 import { cn } from '@/lib/utils'
 import { Check, Copy } from 'lucide-react'
@@ -13,12 +13,17 @@ interface CodeBlockProps {
 export function CodeBlock({ code, lang = 'typescript', filename, className }: CodeBlockProps) {
   const [html, setHtml] = useState('')
   const [copied, setCopied] = useState(false)
-  const ref = useRef(false)
 
+  // Re-highlight whenever the snippet changes: pages share component instances when navigating.
   useEffect(() => {
-    if (ref.current) return
-    ref.current = true
-    highlight(code.trim(), lang).then(setHtml)
+    let cancelled = false
+    setHtml('')
+    highlight(code.trim(), lang).then((result) => {
+      if (!cancelled) setHtml(result)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [code, lang])
 
   const copy = async () => {
