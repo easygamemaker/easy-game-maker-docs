@@ -14,7 +14,7 @@ import { pathToFileURL } from 'node:url'
 import { rolldown } from 'rolldown'
 
 const root = resolve(import.meta.dirname, '..')
-const SDK_VERSION = process.env.EGM_SDK_VERSION ?? '0.2.1'
+const SDK_VERSION = process.env.EGM_SDK_VERSION ?? '0.2.2'
 const skipCompile = process.argv.includes('--skip-compile')
 const work = join(tmpdir(), 'egm-docs-verify')
 mkdirSync(work, { recursive: true })

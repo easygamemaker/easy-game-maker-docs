@@ -31,9 +31,9 @@ const page: DocPage = {
           type: 'props',
           title: t('Live properties', 'Propriedades dinâmicas'),
           rows: [
-            { name: 'text, fontSize, fontFamily, color, fontWeight', type: 'string | number', description: t('Setters that mark the text dirty when the value actually changes. `fontWeight` (default `normal`) has no constructor option, so assign it.', 'Setters que marcam o texto como sujo quando o valor realmente muda. `fontWeight` (padrão `normal`) não tem opção no construtor, então atribua-o.') },
+            { name: 'text, fontSize, fontFamily, color, fontWeight', type: 'string | number', description: t('Setters that mark the text dirty when the value actually changes. `fontWeight` (default `normal`) is also a constructor option.', 'Setters que marcam o texto como sujo quando o valor realmente muda. `fontWeight` (padrão `normal`) também é uma opção do construtor.') },
             { name: 'baseline', type: 'CanvasTextBaseline', default: "'top'", description: t('Plain field, read when the texture is rendered.', 'Campo simples, lido quando a textura é renderizada.') },
-            { name: 'width, height', type: 'number', readonly: true, description: t('Measured by the renderer: text width plus 4 px, and `fontSize * 1.4`. They are 0 until the first frame draws it.', 'Medidos pelo renderer: largura do texto mais 4 px, e `fontSize * 1.4`. Valem 0 até o primeiro quadro em que é desenhado.') },
+            { name: 'width, height', type: 'number', readonly: true, description: t('Measured as soon as the text or its style changes: text width plus 4 px, and `fontSize * 1.4`. They are available before the first frame (in a runtime without a 2D canvas they stay 0 until the first render).', 'Medidos assim que o texto ou o estilo muda: largura do texto mais 4 px, e `fontSize * 1.4`. Já valem antes do primeiro quadro (em um ambiente sem canvas 2D continuam 0 até a primeira renderização).') },
           ],
         },
         {

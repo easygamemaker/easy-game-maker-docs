@@ -19,7 +19,7 @@ const page: DocPage = {
           title: t('Constructor options', 'Opções do construtor'),
           rows: [
             { name: 'points', type: '[number, number][]', description: t('Vertices as `[x, y]` pairs relative to the polygon origin (`x, y`). At least 3 are needed to draw anything.', 'Vértices como pares `[x, y]` relativos à origem do polígono (`x, y`). São necessários pelo menos 3 para desenhar algo.') },
-            { name: 'fill', type: 'string', default: "'#ffffff'", description: t('Hex color `#RRGGBB` or `#RRGGBBAA`.', 'Cor hexadecimal `#RRGGBB` ou `#RRGGBBAA`.') },
+            { name: 'fill', type: 'string', default: "'#ffffff'", description: t('Hex color: `#RGB`, `#RGBA`, `#RRGGBB` or `#RRGGBBAA`. Anything else falls back to white.', 'Cor hexadecimal: `#RGB`, `#RGBA`, `#RRGGBB` ou `#RRGGBBAA`. Qualquer outra coisa vira branco.') },
             { name: 'stroke, strokeWidth', type: 'string, number', description: t('Outline color and width.', 'Cor e largura do contorno.') },
             { name: 'x, y', type: 'number', default: '0', description: t('Where the local origin sits in the parent.', 'Onde a origem local fica no pai.') },
             { name: 'name', type: 'string', description: t('Optional label.', 'Rótulo opcional.') },

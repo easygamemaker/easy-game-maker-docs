@@ -20,7 +20,7 @@ const page: DocPage = {
           rows: [
             { name: 'x, y', type: 'number', default: '0', description: t('Center of the circle.', 'Centro do círculo.') },
             { name: 'radius', type: 'number', default: '32', description: t('Radius in pixels. Passing it also sets `width` and `height` to the diameter.', 'Raio em pixels. Passá-lo também define `width` e `height` como o diâmetro.') },
-            { name: 'fill', type: 'string', default: "'#ffffff'", description: t('Hex color `#RRGGBB` or `#RRGGBBAA`.', 'Cor hexadecimal `#RRGGBB` ou `#RRGGBBAA`.') },
+            { name: 'fill', type: 'string', default: "'#ffffff'", description: t('Hex color: `#RGB`, `#RGBA`, `#RRGGBB` or `#RRGGBBAA`. Anything else falls back to white.', 'Cor hexadecimal: `#RGB`, `#RGBA`, `#RRGGBB` ou `#RRGGBBAA`. Qualquer outra coisa vira branco.') },
             { name: 'stroke, strokeWidth', type: 'string, number', description: t('Outline color and width in pixels.', 'Cor e largura do contorno em pixels.') },
             { name: 'name', type: 'string', description: t('Optional label.', 'Rótulo opcional.') },
           ],
@@ -41,8 +41,8 @@ const page: DocPage = {
           kind: 'info',
           title: t('Anchor and colors', 'Âncora e cores'),
           text: t(
-            'The circle honors `anchorX`/`anchorY` (default 0.5, the center) and `getBounds()` follows the anchor. Fill and outline are baked into one canvas texture in their own colors, so the outline is not tinted by the fill, and changing `fillColor`, `strokeColor`, `strokeWidth` or `radius` is picked up on the next frame. Pass 6 or 8 digit hex colors: a 3 digit hex like `#f00` is not parsed correctly.',
-            'O círculo respeita `anchorX`/`anchorY` (padrão 0,5, o centro) e `getBounds()` segue a âncora. Preenchimento e contorno são gerados em uma textura de canvas, cada um na sua cor, então o contorno não é tingido pelo preenchimento, e mudanças em `fillColor`, `strokeColor`, `strokeWidth` ou `radius` são percebidas no quadro seguinte. Use cores hexadecimais de 6 ou 8 dígitos: um hex de 3 dígitos como `#f00` não é interpretado corretamente.',
+            'The circle honors `anchorX`/`anchorY` (default 0.5, the center) and `getBounds()` follows the anchor. Fill and outline are baked into one canvas texture in their own colors, so the outline is not tinted by the fill, and changing `fillColor`, `strokeColor`, `strokeWidth` or `radius` is picked up on the next frame.',
+            'O círculo respeita `anchorX`/`anchorY` (padrão 0,5, o centro) e `getBounds()` segue a âncora. Preenchimento e contorno são gerados em uma textura de canvas, cada um na sua cor, então o contorno não é tingido pelo preenchimento, e mudanças em `fillColor`, `strokeColor`, `strokeWidth` ou `radius` são percebidas no quadro seguinte.',
           ),
         },
       ],

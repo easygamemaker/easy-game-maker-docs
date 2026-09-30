@@ -123,8 +123,8 @@ const page: DocPage = {
           kind: 'warning',
           title: t('Not everything round-trips', 'Nem tudo é aplicado'),
           text: t(
-            'The loader ignores some fields that the type declares: `fontWeight` is not read for `Text`. `VIEW_DEFAULTS` lists the editor defaults per type.',
-            'O loader ignora alguns campos que o tipo declara: `fontWeight` não é lido para `Text`. `VIEW_DEFAULTS` lista os padrões do editor por tipo.',
+            '`VIEW_DEFAULTS` lists the editor defaults per type.',
+            '`VIEW_DEFAULTS` lista os padrões do editor por tipo.',
           ),
         },
       ],

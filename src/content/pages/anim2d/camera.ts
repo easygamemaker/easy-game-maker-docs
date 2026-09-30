@@ -94,8 +94,8 @@ const page: DocPage = {
           kind: 'warning',
           title: t('Things to know', 'Pontos de atenção'),
           text: t(
-            "Durations here are in **seconds** (unlike a raw `Tween`). The promises only resolve while you keep calling `camera.update(dt)`. Colors must be full hex like `#rrggbb` (or `#rrggbbaa`); short `#fff` is not parsed. A new `pan` cancels the one in progress, and the canceled promise resolves right away.",
-            "As durações aqui são em **segundos** (diferente de um `Tween` puro). As promises só resolvem enquanto você continuar chamando `camera.update(dt)`. As cores precisam ser hex completo, como `#rrggbb` (ou `#rrggbbaa`); o curto `#fff` não é interpretado. Um novo `pan` cancela o que está em andamento, e a promise cancelada resolve na hora.",
+            "Durations here are in **seconds** (unlike a raw `Tween`). The promises only resolve while you keep calling `camera.update(dt)`. Colors are hex: `#rgb`, `#rgba`, `#rrggbb` or `#rrggbbaa` (anything else becomes white). A new `pan` cancels the one in progress, and the canceled promise resolves right away.",
+            "As durações aqui são em **segundos** (diferente de um `Tween` puro). As promises só resolvem enquanto você continuar chamando `camera.update(dt)`. As cores são hexadecimais: `#rgb`, `#rgba`, `#rrggbb` ou `#rrggbbaa` (qualquer outra coisa vira branco). Um novo `pan` cancela o que está em andamento, e a promise cancelada resolve na hora.",
           ),
         },
       ],

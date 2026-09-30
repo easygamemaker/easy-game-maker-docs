@@ -20,7 +20,7 @@ const page: DocPage = {
           rows: [
             { name: 'x, y', type: 'number', default: '0', description: t('Position (default anchor 0.5, so the center).', 'Posição (âncora padrão 0,5, ou seja, o centro).') },
             { name: 'width, height', type: 'number', default: '0', description: t('Size in pixels. With the default 0 the rectangle is invisible, so always set them.', 'Tamanho em pixels. Com o padrão 0 o retângulo é invisível, então sempre defina.') },
-            { name: 'fill', type: 'string', default: "'#ffffff'", description: t('Hex color `#RRGGBB` or `#RRGGBBAA`. Any other format falls back to white.', 'Cor hexadecimal `#RRGGBB` ou `#RRGGBBAA`. Qualquer outro formato vira branco.') },
+            { name: 'fill', type: 'string', default: "'#ffffff'", description: t('Hex color: `#RGB`, `#RGBA`, `#RRGGBB` or `#RRGGBBAA`. Any other format falls back to white.', 'Cor hexadecimal: `#RGB`, `#RGBA`, `#RRGGBB` ou `#RRGGBBAA`. Qualquer outro formato vira branco.') },
             { name: 'stroke, strokeWidth', type: 'string, number', description: t('Border color (hex) and width in pixels. The border is drawn inside the rectangle, over the fill. Nothing is drawn while `strokeWidth` is 0.', 'Cor da borda (hex) e largura em pixels. A borda é desenhada por dentro do retângulo, sobre o preenchimento. Nada é desenhado enquanto `strokeWidth` for 0.') },
             { name: 'cornerRadius', type: 'number', default: '0', description: t('Corner radius in pixels, clamped to half of the shorter side.', 'Raio dos cantos em pixels, limitado à metade do lado menor.') },
             { name: 'name', type: 'string', description: t('Optional label.', 'Rótulo opcional.') },
