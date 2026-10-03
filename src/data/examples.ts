@@ -59,6 +59,9 @@ export const SDK_DOCS: Record<string, string> = {
   NetworkRoom: '/network/room',
   AdManager: '/monetization/ads',
   IAPManager: '/monetization/iap',
+  GButton: '/input/gamepad',
+  GAxis: '/input/gamepad',
+  PolygonShape: '/display/polygon-shape',
   // 3D engine (easy-game-maker/3d)
   createGame: '/3d/engine',
   thirdPerson: '/3d/controls',
@@ -427,6 +430,38 @@ export const EXAMPLES: Example[] = [
     lines: 1307,
     tests: 1,
     extras: [k('Vitest'), k('three.js')],
+  },
+  {
+    slug: 'street-brazil-fighter',
+    folder: 'street-brazil-fighter',
+    type: '2d',
+    name: t('Street Brazil Fighter', 'Street Brazil Fighter'),
+    genre: t('Fighting game, 1P vs CPU or 2P', 'Jogo de luta, 1P contra a CPU ou 2P'),
+    tagline: t('Six folklore fighters, nine Brazilian stages, best of three.', 'Seis lutadores do folclore, nove cenários brasileiros, melhor de três.'),
+    about: t(
+      'A Street Fighter style fighting game. The fight is a deterministic 60 Hz simulation in plain TypeScript with no engine imports (state machine, hitboxes as frame data, projectiles, rounds and a seeded AI), so it is unit tested in Node; the scenes only draw it. The stages and fighter sprites were generated with Nano Banana Pro and processed by scripts that are part of the example.',
+      'Um jogo de luta no estilo Street Fighter. A luta é uma simulação determinística a 60 Hz em TypeScript puro, sem imports do motor (máquina de estados, hitboxes como dados de quadros, projéteis, rounds e uma IA com semente), por isso é testada em Node; as cenas só a desenham. Os cenários e os sprites foram gerados com o Nano Banana Pro e processados por scripts que fazem parte do exemplo.',
+    ),
+    image: '/images/examples/street-brazil-fighter.webp',
+    canvas: '1300 × 700',
+    controls: [
+      { input: k('W A S D'), action: t('P1 move, jump, crouch', 'P1 andar, pular, agachar') },
+      { input: k('J / K / L / U'), action: t('P1 punch, kick, special, block', 'P1 soco, chute, especial, defesa') },
+      { input: t('Arrows', 'Setas'), action: t('P2 move, jump, crouch', 'P2 andar, pular, agachar') },
+      { input: k('Numpad 1 / 2 / 3 / 0'), action: t('P2 punch, kick, special, block', 'P2 soco, chute, especial, defesa') },
+      { input: t('Gamepad', 'Controle'), action: t('D-pad, X punch, A kick, Y special, B block', 'D-pad, X soco, A chute, Y especial, B defesa') },
+      { input: k('Esc / P / Start'), action: t('Pause', 'Pausar') },
+    ],
+    highlights: [
+      t('Six fighters with their own frame data and a different special each: a dash, four projectiles and a ground wave.', 'Seis lutadores com dados de quadros próprios e um especial diferente cada: um avanço, quatro projéteis e uma onda no chão.'),
+      t('Three CPU difficulty levels driven by a seeded AI with reaction delay, spacing and blocking.', 'Três níveis de dificuldade da CPU, com uma IA de semente fixa que tem tempo de reação, distância e defesa.'),
+      t('The stage is a wide image scrolled by a camera that follows the fighters; add ?autoplay=cpu&speed=8 to watch a CPU match, or ?hitboxes=1 to see the boxes.', 'O cenário é uma imagem larga rolada por uma câmera que segue os lutadores; adicione ?autoplay=cpu&speed=8 para ver uma partida da CPU, ou ?hitboxes=1 para ver as caixas.'),
+    ],
+    sdk: ['App', 'Scene', 'SceneParams', 'Group', 'Sprite', 'Text', 'RectShape', 'CircleShape', 'PolygonShape', 'Texture', 'GButton', 'GAxis'],
+    files: 50,
+    lines: 6373,
+    tests: 167,
+    extras: [k('Vitest'), t('Nano Banana Pro art', 'Arte do Nano Banana Pro')],
   },
 ]
 
