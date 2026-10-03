@@ -8,7 +8,7 @@ const page: DocPage = {
     'Empacote o jogo para uma plataforma de destino. Só builds desktop funcionam hoje; todos os outros alvos encerram com a mensagem "not available yet".',
   ),
   source: 'src/cli/commands/build.ts',
-  related: ['/build/desktop', '/tools/config', '/workflow', '/build/web', '/build/mobile'],
+  related: ['/build/desktop', '/tools/config', '/workflow', '/build/web', '/build/mobile', '/cli/publish'],
   sections: [
     {
       id: 'usage',

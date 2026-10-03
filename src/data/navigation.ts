@@ -424,6 +424,8 @@ export const NAVIGATION: NavSection[] = [
       item('/cli/e2e', 'egm e2e', 'egm e2e'),
       item('/cli/editor', 'egm editor', 'egm editor', 'BETA'),
       item('/cli/go', 'egm go', 'egm go'),
+      item('/cli/login', 'egm login', 'egm login', 'NEW'),
+      item('/cli/publish', 'egm publish', 'egm publish', 'NEW'),
     ],
   },
   {
