@@ -439,8 +439,8 @@ export const EXAMPLES: Example[] = [
     genre: t('Fighting game, 1P vs CPU or 2P', 'Jogo de luta, 1P contra a CPU ou 2P'),
     tagline: t('Six folklore fighters, nine Brazilian stages, best of three.', 'Seis lutadores do folclore, nove cenários brasileiros, melhor de três.'),
     about: t(
-      'A Street Fighter style fighting game. The fight is a deterministic 60 Hz simulation in plain TypeScript with no engine imports (state machine, hitboxes as frame data, projectiles, rounds and a seeded AI), so it is unit tested in Node; the scenes only draw it. The stages and fighter sprites were generated with Nano Banana Pro and processed by scripts that are part of the example.',
-      'Um jogo de luta no estilo Street Fighter. A luta é uma simulação determinística a 60 Hz em TypeScript puro, sem imports do motor (máquina de estados, hitboxes como dados de quadros, projéteis, rounds e uma IA com semente), por isso é testada em Node; as cenas só a desenham. Os cenários e os sprites foram gerados com o Nano Banana Pro e processados por scripts que fazem parte do exemplo.',
+      'A Street Fighter style fighting game. The fight is a deterministic 60 Hz simulation in plain TypeScript with no engine imports (state machine, hitboxes as frame data, projectiles, rounds and a seeded AI), so it is unit tested in Node; the scenes only draw it. The stages and fighter sprites were generated with Nano Banana Pro and processed by scripts that are part of the example. Every fighter has animation frames (walk cycle, idle breathing, punch, kick and special) played by a small pure clip system locked to the move frame data. In the folklore the Saci has one leg and the Curupira backwards feet, which the image model could not draw even after several attempts, so the Curupira leaves glowing footprints that point the wrong way instead.',
+      'Um jogo de luta no estilo Street Fighter. A luta é uma simulação determinística a 60 Hz em TypeScript puro, sem imports do motor (máquina de estados, hitboxes como dados de quadros, projéteis, rounds e uma IA com semente), por isso é testada em Node; as cenas só a desenham. Os cenários e os sprites foram gerados com o Nano Banana Pro e processados por scripts que fazem parte do exemplo. Cada lutador tem quadros de animação (ciclo de caminhada, respiração parada, soco, chute e especial) tocados por um pequeno sistema de clipes puro, preso aos dados de quadros dos golpes. No folclore o Saci tem uma perna só e o Curupira tem os pés virados para trás, o que o modelo de imagem não conseguiu desenhar mesmo após várias tentativas; por isso o Curupira deixa pegadas brilhantes que apontam para o lado errado.',
     ),
     image: '/images/examples/street-brazil-fighter.webp',
     canvas: '1300 × 700',
@@ -455,12 +455,13 @@ export const EXAMPLES: Example[] = [
     highlights: [
       t('Six fighters with their own frame data and a different special each: a dash, four projectiles and a ground wave.', 'Seis lutadores com dados de quadros próprios e um especial diferente cada: um avanço, quatro projéteis e uma onda no chão.'),
       t('Three CPU difficulty levels driven by a seeded AI with reaction delay, spacing and blocking.', 'Três níveis de dificuldade da CPU, com uma IA de semente fixa que tem tempo de reação, distância e defesa.'),
+      t('A scripted play-through (tools/playtest.mjs) drives the built game with the keyboard and films every action as a contact sheet; all 21 pairs of fighters played a full match without a stuck state.', 'Um play-through com script (tools/playtest.mjs) joga o jogo compilado com o teclado e filma cada ação em uma folha de contato; os 21 pares de lutadores jogaram uma partida completa sem travar.'),
       t('The stage is a wide image scrolled by a camera that follows the fighters; add ?autoplay=cpu&speed=8 to watch a CPU match, or ?hitboxes=1 to see the boxes.', 'O cenário é uma imagem larga rolada por uma câmera que segue os lutadores; adicione ?autoplay=cpu&speed=8 para ver uma partida da CPU, ou ?hitboxes=1 para ver as caixas.'),
     ],
     sdk: ['App', 'Scene', 'SceneParams', 'Group', 'Sprite', 'Text', 'RectShape', 'CircleShape', 'PolygonShape', 'Texture', 'GButton', 'GAxis'],
-    files: 50,
-    lines: 6373,
-    tests: 167,
+    files: 52,
+    lines: 6771,
+    tests: 210,
     extras: [k('Vitest'), t('Nano Banana Pro art', 'Arte do Nano Banana Pro')],
   },
 ]
