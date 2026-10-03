@@ -19,8 +19,8 @@ const page: DocPage = {
           kind: 'warning',
           title: t('Not available yet', 'Ainda não disponível'),
           text: t(
-            '`egm build web` prints `The "web" build target is not available yet. Only desktop builds are supported right now: egm build desktop [macos|windows|linux]` and exits with code 1. The builder exists in the code and will be opened together with the other targets. An EGM Marketplace for publishing is planned, not shipped.',
-            '`egm build web` imprime `The "web" build target is not available yet. Only desktop builds are supported right now: egm build desktop [macos|windows|linux]` e encerra com código 1. O builder existe no código e será aberto junto com os outros alvos. Um EGM Marketplace para publicação está planejado, mas ainda não existe.',
+            '`egm build web` prints `The "web" build target is not available yet. Only desktop builds are supported right now: egm build desktop [macos|windows|linux]` and exits with code 1. The builder exists in the code and will be opened together with the other targets. To publish a game on the EGM marketplace, use [`egm publish`](/cli/publish), which does its own web build and does not depend on this target.',
+            '`egm build web` imprime `The "web" build target is not available yet. Only desktop builds are supported right now: egm build desktop [macos|windows|linux]` e encerra com código 1. O builder existe no código e será aberto junto com os outros alvos. Para publicar um jogo no marketplace do EGM, use o [`egm publish`](/cli/publish), que faz o seu próprio build web e não depende deste alvo.',
           ),
         },
         {
