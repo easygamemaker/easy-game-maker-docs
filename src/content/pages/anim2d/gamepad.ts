@@ -8,7 +8,7 @@ const page: DocPage = {
     "app.gamepad consulta a Gamepad API do navegador a cada quadro e expõe botões, analógicos, gatilhos e direcional, com zona morta e detecção de acabou-de-pressionar.",
   ),
   source: 'src/engine/input/GamepadManager.ts',
-  related: ['/input/keyboard-mouse', '/physics/body'],
+  related: ['/input/action-map', '/input/keyboard-mouse', '/physics/body'],
   sections: [
     {
       id: 'overview',
@@ -28,6 +28,15 @@ const page: DocPage = {
           text: t(
             "Most browsers only report a controller after the player presses a button once. Before that `isConnected` is false; this is browser behavior, not an engine bug.",
             "A maioria dos navegadores só reporta um controle depois que o jogador aperta um botão uma vez. Antes disso `isConnected` é false; isso é comportamento do navegador, não um bug da engine.",
+          ),
+        },
+        {
+          type: 'callout',
+          kind: 'tip',
+          title: t('Several players, rebinding, one action for keys and pad', 'Vários jogadores, remapeamento, uma ação para teclas e controle'),
+          text: t(
+            "`GamepadManager` answers per button and controller index, and computes `justPressed` once per rendered frame. When one action should answer to a key **and** a button (and a stick), when two players each have their own controller, or when the player can rebind controls, use an [ActionMap](/input/action-map). It reads `navigator.getGamepads()` by itself, with one controller slot per player, and takes its default deadzone from `app.gamepad.deadzone`.",
+            "O `GamepadManager` responde por botão e por índice de controle, e calcula `justPressed` uma vez por quadro desenhado. Quando uma ação deve responder a uma tecla **e** a um botão (e a um analógico), quando dois jogadores têm cada um o seu controle, ou quando o jogador pode remapear os controles, use um [ActionMap](/input/action-map). Ele lê `navigator.getGamepads()` por conta própria, com um slot de controle por jogador, e pega a zona morta padrão de `app.gamepad.deadzone`.",
           ),
         },
       ],

@@ -8,7 +8,7 @@ const page: DocPage = {
     'Padrões curtos e completos para o que quase todo jogo 2D precisa: movimento, física, tweens, câmera, saves e pooling.',
   ),
   source: 'src/engine/index.ts',
-  related: ['/first-game', '/guide/concepts', '/physics/world', '/camera', '/debug/save'],
+  related: ['/first-game', '/core/fixed-step', '/core/texture-atlas', '/guide/concepts', '/physics/world', '/camera', '/debug/save'],
   sections: [
     {
       id: 'movement',
@@ -391,6 +391,112 @@ app.init()
 app.scenes.add('turret', TurretScene)
 void app.scenes.go('turret', { params: { app } })
 app.run()`,
+        },
+      ],
+    },
+    {
+      id: 'fixed-sim',
+      title: t('A deterministic simulation with an interpolated view', 'Uma simulação determinística com visual interpolado'),
+      blocks: [
+        {
+          type: 'p',
+          text: t(
+            'Keep the rules in a pure function that only knows the step length and a seeded [Rng](/core/rng), run it from `Scene.onFixedUpdate`, and let `Scene.onRender(alpha)` draw a position blended between the last two steps. The result is identical on a 60 Hz and a 144 Hz screen, and smooth on both. See [Fixed Step](/core/fixed-step).',
+            'Mantenha as regras em uma função pura que só conhece a duração do passo e um [Rng](/core/rng) com semente, rode-a em `Scene.onFixedUpdate`, e deixe `Scene.onRender(alpha)` desenhar uma posição misturada entre os dois últimos passos. O resultado é idêntico em uma tela de 60 Hz (hertz) e em uma de 144 Hz, e suave nas duas. Veja [Passo Fixo](/core/fixed-step).',
+          ),
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          filename: 'src/arena.ts',
+          check: 'compile',
+          code: `import { App, RectShape, Rng, Scene } from 'easy-game-maker'
+import type { SceneParams } from 'easy-game-maker'
+
+interface Ball {
+  readonly x: number
+  readonly vx: number
+}
+
+// Pure rules: the same seed and the same steps always give the same result
+function stepBall(ball: Ball, dt: number, width: number, rng: Rng): Ball {
+  const x = ball.x + ball.vx * dt
+  if (x < 0 || x > width) return { x: Math.min(Math.max(x, 0), width), vx: -ball.vx * rng.range(0.9, 1.1) }
+  return { x, vx: ball.vx }
+}
+
+class Arena extends Scene {
+  private rng = new Rng(1)
+  private prev: Ball = { x: 40, vx: 220 }
+  private cur: Ball = this.prev
+  private readonly view = new RectShape({ x: 40, y: 160, width: 24, height: 24, fill: '#22d3ee' })
+
+  override onCreate(params?: SceneParams): void {
+    this.rng = new Rng(typeof params?.seed === 'number' ? params.seed : 1)
+    this.add(this.view)
+  }
+
+  override onFixedUpdate(_step: number, dt: number): void {
+    this.prev = this.cur
+    this.cur = stepBall(this.cur, dt, 640, this.rng)
+  }
+
+  override onRender(alpha: number): void {
+    this.view.x = this.prev.x + (this.cur.x - this.prev.x) * alpha
+  }
+}
+
+const app = new App({ width: 640, height: 320, fixedHz: 60 })
+app.scenes.add('arena', Arena)
+void app.scenes.go('arena', { params: { seed: 2024 } })
+app.run()`,
+        },
+      ],
+    },
+    {
+      id: 'sprite-sheet',
+      title: t('Slice a sprite sheet', 'Fatiar uma folha de sprites'),
+      blocks: [
+        {
+          type: 'p',
+          text: t(
+            'For a grid of equal cells you do not need a JSON file: upload the image once and cut it with `Texture.region`. Every region shares one GPU texture, so the frames batch into one draw call, and each region draws at its own size, 1:1. The asset manifest always uploads with linear filtering, so for crisp pixel art decode the image yourself and ask for `\'nearest\'`. With a packer JSON or the simple format, use a [TextureAtlas](/core/texture-atlas) instead.',
+            'Para uma grade de células iguais você não precisa de um arquivo JSON (JavaScript Object Notation): envie a imagem uma vez e recorte com `Texture.region`. Todas as regiões compartilham uma textura da GPU (Graphics Processing Unit), então os quadros entram em uma única chamada de desenho, e cada região é desenhada no próprio tamanho, 1:1. O manifesto de assets sempre envia com filtro linear, então, para pixel art nítida, decodifique a imagem você mesmo e peça `\'nearest\'`. Com um JSON de empacotador ou o formato simples, use um [TextureAtlas](/core/texture-atlas).',
+          ),
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          filename: 'src/sheet.ts',
+          check: 'compile',
+          code: `import { AnimatedSprite, App, Texture } from 'easy-game-maker'
+
+const CELL_W = 32
+const CELL_H = 48
+const COLUMNS = 6
+
+export async function loadWalk(app: App): Promise<AnimatedSprite> {
+  const response = await fetch(app.assets.resolveUrl('assets/hero-sheet.png'))
+  const bitmap = await createImageBitmap(await response.blob())
+
+  // One GPU texture for the whole sheet, crisp when scaled
+  const sheet = app.renderer.uploadTexture('hero-sheet', bitmap, 'nearest')
+
+  const frames = Array.from({ length: COLUMNS }, (_, i) => Texture.region(sheet, i * CELL_W, 0, CELL_W, CELL_H))
+  const walk = new AnimatedSprite({ frames, fps: 12, x: 200, y: 240 })
+  walk.scaleX = walk.scaleY = 3
+  walk.play()
+  return walk
+}`,
+        },
+        {
+          type: 'callout',
+          kind: 'warning',
+          title: t('Leave a margin between cells', 'Deixe uma margem entre as células'),
+          text: t(
+            'With linear filtering a scaled or sub-pixel draw can blend the neighbouring pixels at the edge of a region. Pack with one pixel of padding or edge extrusion, or use `\'nearest\'`.',
+            'Com filtro linear, um desenho ampliado ou em posição fracionária pode misturar os pixels vizinhos na borda de uma região. Empacote com um pixel de margem ou extrusão de borda, ou use `\'nearest\'`.',
+          ),
         },
       ],
     },
