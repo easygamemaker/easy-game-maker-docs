@@ -14,7 +14,9 @@ import { pathToFileURL } from 'node:url'
 import { rolldown } from 'rolldown'
 
 const root = resolve(import.meta.dirname, '..')
-const SDK_VERSION = process.env.EGM_SDK_VERSION ?? '0.2.4'
+const SDK_VERSION = process.env.EGM_SDK_VERSION ?? '0.3.0'
+// Optional: a local `npm pack` tarball of the SDK, to check snippets against code that is not published yet.
+const SDK_TARBALL = process.env.EGM_SDK_TARBALL ? resolve(process.env.EGM_SDK_TARBALL) : undefined
 const skipCompile = process.argv.includes('--skip-compile')
 const work = join(tmpdir(), 'egm-docs-verify')
 mkdirSync(work, { recursive: true })
@@ -91,11 +93,12 @@ console.log(`pages: ${pages.length}/${ALL_ITEMS.filter((i) => !i.slug.startsWith
 if (missing.length) console.log(`missing pages (${missing.length}): ${missing.join(' ')}`)
 
 if (!skipCompile) {
-  const proj = join(work, `sdk-${SDK_VERSION}`)
+  const proj = join(work, SDK_TARBALL ? 'sdk-local' : `sdk-${SDK_VERSION}`)
+  if (SDK_TARBALL) execFileSync('rm', ['-rf', join(proj, 'node_modules/easy-game-maker')])
   if (!existsSync(join(proj, 'node_modules/easy-game-maker'))) {
     mkdirSync(proj, { recursive: true })
     writeFileSync(join(proj, 'package.json'), JSON.stringify({ name: 'verify', private: true, type: 'module' }))
-    execFileSync('npm', ['install', `easy-game-maker@${SDK_VERSION}`, 'three@0.185.1', 'typescript', '@types/three@0.185', '--no-audit', '--no-fund'], { cwd: proj, stdio: 'inherit' })
+    execFileSync('npm', ['install', SDK_TARBALL ?? `easy-game-maker@${SDK_VERSION}`, 'three@0.185.1', 'typescript', '@types/three@0.185', '--no-audit', '--no-fund'], { cwd: proj, stdio: 'inherit' })
   }
   const src = join(proj, 'snippets')
   mkdirSync(src, { recursive: true })
