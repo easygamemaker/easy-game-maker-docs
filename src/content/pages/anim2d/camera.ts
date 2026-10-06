@@ -8,7 +8,7 @@ const page: DocPage = {
     "Uma câmera 2D que rola e dá zoom em um Group de mundo, segue um alvo, treme, faz pan e escurece ou pisca a tela.",
   ),
   source: 'src/engine/camera/Camera.ts',
-  related: ['/animation/easing', '/animation/tween', '/animation/transitions'],
+  related: ['/core/fixed-step', '/animation/easing', '/animation/tween', '/animation/transitions'],
   sections: [
     {
       id: 'setup',
@@ -81,7 +81,7 @@ const page: DocPage = {
           type: 'table',
           head: [t('Method', 'Método'), t('Defaults', 'Padrões'), t('Behavior', 'Comportamento')],
           rows: [
-            [t('`shake(intensity, duration)`', '`shake(intensity, duration)`'), t('8 px, 0.4 s', '8 px, 0,4 s'), t("Random offset with linear decay, applied to the world group only (the camera position is untouched). Returns `this`. A new call restarts it.", "Deslocamento aleatório com decaimento linear, aplicado só ao group do mundo (a posição da câmera não muda). Devolve `this`. Uma nova chamada reinicia.")],
+            [t('`shake(intensity, duration)`', '`shake(intensity, duration)`'), t('8 px, 0.4 s', '8 px, 0,4 s'), t("Random offset with linear decay, applied to the world group only (the camera position is untouched). Returns `this`. A new call restarts it. The shake advances with the `dt` you give to `camera.update(dt)`: the camera does not read `app.timeScale` or `app.paused`, so a game that feeds it a real frame time keeps shaking while paused, and one that feeds it the `onUpdate` `dt` follows the scaled time.", "Deslocamento aleatório com decaimento linear, aplicado só ao group do mundo (a posição da câmera não muda). Devolve `this`. Uma nova chamada reinicia. O tremor avança com o `dt` que você passa a `camera.update(dt)`: a câmera não lê `app.timeScale` nem `app.paused`, então um jogo que a alimenta com o tempo real do quadro continua tremendo na pausa, e um que a alimenta com o `dt` do `onUpdate` segue o tempo escalado.")],
             [t('`pan(x, y, duration, easing)`', '`pan(x, y, duration, easing)`'), t('`Easing.outCubic`', '`Easing.outCubic`'), t("Tweens `x`/`y`. Returns a `Promise<void>`. Does not disable `follow`, call `unfollow()` first.", "Anima `x`/`y`. Devolve `Promise<void>`. Não desativa o `follow`, chame `unfollow()` antes.")],
             [t('`zoomTo(zoom, duration, easing)`', '`zoomTo(zoom, duration, easing)`'), t('`Easing.outCubic`', '`Easing.outCubic`'), t("Tweens `zoom`. Returns a `Promise<void>`.", "Anima `zoom`. Devolve `Promise<void>`.")],
             [t('`flash(duration, color)`', '`flash(duration, color)`'), t('0.25 s, `#ffffff`', '0,25 s, `#ffffff`'), t("Overlay starts opaque and fades to transparent. Promise.", "O overlay começa opaco e some. Promise.")],

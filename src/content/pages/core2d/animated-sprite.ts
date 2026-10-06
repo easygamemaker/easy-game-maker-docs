@@ -8,7 +8,7 @@ const page: DocPage = {
     'Um Sprite que percorre uma lista de texturas de quadros a uma taxa fixa, com intervalos e um evento de conclusão.',
   ),
   source: 'src/engine/display/AnimatedSprite.ts',
-  related: ['/display/sprite', '/core/assets', '/core/events', '/animation/tween'],
+  related: ['/display/sprite', '/animation/clips', '/core/texture-atlas', '/core/assets', '/core/events', '/animation/tween'],
   sections: [
     {
       id: 'create',
@@ -47,6 +47,9 @@ const page: DocPage = {
             { name: 'gotoAndStop(frame)', type: 'void', description: t('Shows a frame (clamped to the valid range) and stops.', 'Mostra um quadro (limitado ao intervalo válido) e para.') },
             { name: 'gotoAndPlay(frame)', type: 'void', description: t('Jumps to a frame and plays the full frame range.', 'Salta para um quadro e reproduz todo o intervalo de quadros.') },
             { name: 'playRange(start, end, fps, loop, onComplete?)', type: 'void', description: t('Plays frames `start` to `end` (0-based, inclusive) at the given rate. The `fps` and `loop` you pass replace the sprite settings from then on. `onComplete` runs when a non-looping range ends.', 'Reproduz os quadros de `start` a `end` (base 0, inclusivo) na taxa dada. O `fps` e o `loop` passados substituem as configurações do sprite daí em diante. `onComplete` roda quando um intervalo sem loop termina.') },
+            { name: 'play(clip, options?)', type: 'void', description: t('Plays a [Clip](/animation/clips) (durations per frame, loop modes, events), in seconds or in simulation steps. `play()` with no argument still resumes the frame-array animation.', 'Toca um [Clip](/animation/clips) (durações por quadro, modos de laço, eventos), em segundos ou em passos da simulação. `play()` sem argumento continua retomando a animação por array de quadros.') },
+            { name: 'stepClip() / seek(clip, t, options?)', type: 'void', description: t('`stepClip()` advances a clip played with `unit: "steps"` by one simulation step. `seek` shows the frame of a clip at a time without playing. See [Clips](/animation/clips).', '`stepClip()` avança um clipe tocado com `unit: "steps"` por um passo da simulação. `seek` mostra o quadro de um clipe em um tempo, sem tocar. Veja [Clipes](/animation/clips).') },
+            { name: 'atlas / clipEvent', type: 'TextureAtlas | null / event', description: t('`atlas` (also a constructor option) resolves the frame names of a clip. The `"clipEvent"` event carries `{ name, frame, clip }`.', '`atlas` (também uma opção do construtor) resolve os nomes de quadros de um clipe. O evento `"clipEvent"` carrega `{ name, frame, clip }`.') },
             { name: 'update(dt)', type: 'void', description: t('Advances the animation by `dt` seconds. Does nothing while stopped or finished. The scene calls it for you each frame.', 'Avança a animação em `dt` segundos. Não faz nada enquanto parado ou terminado. A cena o chama por você a cada quadro.') },
             { name: 'currentFrame', type: 'number', readonly: true, description: t('Index of the frame on screen.', 'Índice do quadro na tela.') },
             { name: 'isPlaying', type: 'boolean', readonly: true, description: t('True while advancing.', 'True enquanto avança.') },

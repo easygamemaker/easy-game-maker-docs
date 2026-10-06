@@ -51,6 +51,7 @@ const page: DocPage = {
           rows: [
             { name: 'isDone', type: 'boolean', readonly: true, description: t("True after completion or after `cancel()`.", "Verdadeiro depois de concluir ou de `cancel()`.") },
             { name: 'update(dtMs)', type: '(dtMs: number) => void', description: t("Advance by `dtMs` milliseconds. Does nothing once done or cancelled.", "Avança `dtMs` milissegundos. Não faz nada depois de concluído ou cancelado.") },
+            { name: 'updateSeconds(dtSeconds)', type: '(dtSeconds: number) => void', description: t("Advance by `dtSeconds` **seconds**, the unit of `Scene.onUpdate(dt)`. Equivalent to `update(dtSeconds * 1000)`; `duration` is still in milliseconds.", "Avança `dtSeconds` **segundos**, a unidade de `Scene.onUpdate(dt)`. Equivale a `update(dtSeconds * 1000)`; a `duration` continua em milissegundos.") },
             { name: 'cancel()', type: '() => void', description: t("Stops the tween where it is. `onComplete` is not called and values are left as they were.", "Para o tween onde está. `onComplete` não é chamado e os valores ficam como estavam.") },
           ],
         },
@@ -59,8 +60,8 @@ const page: DocPage = {
           kind: 'warning',
           title: t('Units differ from the scene loop', 'Unidades diferentes do laço da cena'),
           text: t(
-            "`Tween.update` takes **milliseconds**, but `Scene.onUpdate(dt)` gives you **seconds**. Multiply by 1000 when you drive a Tween yourself. `TransitionManager.update` and `Camera.update` take seconds and convert internally.",
-            "`Tween.update` recebe **milissegundos**, mas `Scene.onUpdate(dt)` entrega **segundos**. Multiplique por 1000 ao avançar um Tween manualmente. `TransitionManager.update` e `Camera.update` recebem segundos e convertem por dentro.",
+            "`Tween.update` takes **milliseconds**, but `Scene.onUpdate(dt)` gives you **seconds**. Passing that `dt` straight to `update` moves the tween 1000 times too slowly: call `updateSeconds(dt)` instead, or multiply by 1000 yourself. `TransitionManager.update` and `Camera.update` take seconds and convert internally.",
+            "`Tween.update` recebe **milissegundos**, mas `Scene.onUpdate(dt)` entrega **segundos**. Passar esse `dt` direto ao `update` move o tween 1000 vezes devagar demais: chame `updateSeconds(dt)`, ou multiplique por 1000 você mesmo. `TransitionManager.update` e `Camera.update` recebem segundos e convertem por dentro.",
           ),
         },
         {

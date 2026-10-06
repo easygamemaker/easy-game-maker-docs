@@ -164,6 +164,28 @@ describe('stepBall', () => {
       ],
     },
     {
+      id: 'mock-app',
+      title: t('createMockApp covers the whole App', 'createMockApp cobre o App inteiro'),
+      blocks: [
+        {
+          type: 'p',
+          text: t(
+            "In the SDK repository, `createMockApp` (in `src/testing`, which needs Vitest) now covers the whole public surface of `App`: `gamepad`, `network`, `shaders`, `assets.getTexture`, `assets.loadImageFromUrl`, `assets.resolveUrl`, `timers.after` and `timers.every`, the renderer `gl`, `drawCalls`, `uploadTexture`, `releaseTexture` and `setPostProcessor`, the audio layer (`bus`, `sfx`, `music`, `persist`, as loose fakes), and the fixed step members (`fixedUpdate`, `advance`, `timeScale`, `paused`). Its stubs are typed against the real classes, so the SDK build fails when a manager gains, loses or renames a public member and the mock does not follow, and a contract test compares method names with the real managers. Before this, the `timers` stub had `schedule` and `cancel` instead of the real `after` and `every`, so scenes that used timers broke in tests.",
+            "No repositório do SDK, o `createMockApp` (em `src/testing`, que exige o Vitest) agora cobre toda a superfície pública do `App`: `gamepad`, `network`, `shaders`, `assets.getTexture`, `assets.loadImageFromUrl`, `assets.resolveUrl`, `timers.after` e `timers.every`, o `gl`, o `drawCalls`, o `uploadTexture`, o `releaseTexture` e o `setPostProcessor` do renderer, a camada de áudio (`bus`, `sfx`, `music`, `persist`, como dublês soltos) e os membros do passo fixo (`fixedUpdate`, `advance`, `timeScale`, `paused`). Os stubs são tipados contra as classes reais, então o build do SDK falha quando um manager ganha, perde ou renomeia um membro público e o mock não acompanha, e um teste de contrato compara nomes de métodos com os managers reais. Antes disso, o stub de `timers` tinha `schedule` e `cancel` no lugar de `after` e `every`, e cenas que usavam timers quebravam nos testes.",
+          ),
+        },
+        {
+          type: 'callout',
+          kind: 'warning',
+          title: t('The mock does not run the loops', 'O mock não roda os laços'),
+          text: t(
+            "In the mock, `fixedUpdate` returns a no-op unsubscribe function and does not call your callback, and `advance` does nothing. To test a fixed-step simulation, call your step function yourself, or drive a `FixedStepLoop` (it has no DOM), as in [Fixed Step](/core/fixed-step). Like the rest of `src/testing`, the mock is not part of the npm package.",
+            "No mock, o `fixedUpdate` devolve uma função de cancelamento vazia e não chama o seu callback, e o `advance` não faz nada. Para testar uma simulação de passo fixo, chame você mesmo a sua função de passo, ou conduza um `FixedStepLoop` (ele não usa DOM), como em [Passo Fixo](/core/fixed-step). Como o resto de `src/testing`, o mock não faz parte do pacote npm.",
+          ),
+        },
+      ],
+    },
+    {
       id: 'e2e',
       title: t('End-to-end tests', 'Testes end-to-end'),
       blocks: [

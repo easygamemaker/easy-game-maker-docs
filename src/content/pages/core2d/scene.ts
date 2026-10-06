@@ -27,7 +27,9 @@ const page: DocPage = {
           rows: [
             { name: 'onCreate(params?)', type: 'void | Promise<void>', description: t('Runs once, the first time the scene is entered. The manager awaits it, so async texture loading finishes before the first render. `params` comes from `go(name, { params })`.', 'Roda uma vez, na primeira vez que a cena é acessada. O manager aguarda o resultado, então o carregamento assíncrono de texturas termina antes do primeiro desenho. `params` vem de `go(name, { params })`.') },
             { name: 'onUpdate(dt)', type: 'void', description: t('Every frame while the scene is current. `dt` is in seconds.', 'A cada quadro enquanto a cena é a atual. `dt` está em segundos.') },
-            { name: 'onResume()', type: 'void', description: t('Called each time the scene becomes current, including the first time.', 'Chamado toda vez que a cena se torna a atual, inclusive na primeira.') },
+            { name: 'onResume(params?)', type: 'void', description: t('Called each time the scene becomes current through `go`, including the first time and when the scene was already created and cached (then `onCreate` does not run again). `params` are the `params` of that `go` call, so a cached scene can receive new data. Overrides without the argument keep working.', 'Chamado toda vez que a cena se torna a atual por `go`, inclusive na primeira vez e quando a cena já estava criada e em cache (nesse caso o `onCreate` não roda de novo). Os `params` são os `params` daquela chamada de `go`, então uma cena em cache pode receber dados novos. Sobrescritas sem o argumento continuam funcionando.') },
+            { name: 'onFixedUpdate?(step, dt)', type: 'void', description: t('Optional fixed step hook at the App `fixedHz`, before `onUpdate`. See [Fixed Step](/core/fixed-step).', 'Hook opcional de passo fixo, na taxa `fixedHz` do App, antes do `onUpdate`. Veja [Passo Fixo](/core/fixed-step).') },
+            { name: 'onRender?(alpha)', type: 'void', description: t('Optional, once per frame after `onUpdate` and right before the draw; `alpha` in [0, 1) is for interpolation. See [Fixed Step](/core/fixed-step).', 'Opcional, uma vez por quadro depois do `onUpdate` e logo antes do desenho; o `alpha` em [0, 1) serve para interpolação. Veja [Passo Fixo](/core/fixed-step).') },
             { name: 'onPause()', type: 'void', description: t('Called when another scene replaces this one.', 'Chamado quando outra cena substitui esta.') },
             { name: 'onDestroy()', type: 'void', description: t('Called by `destroy()`, which then destroys the children.', 'Chamado por `destroy()`, que em seguida destrói os filhos.') },
           ],
@@ -56,6 +58,7 @@ const page: DocPage = {
             { name: 'viewWidth', type: 'number', description: t('Distance in pixels a `slide` travels. `App` sets it from its `width`.', 'Distância em pixels percorrida por um `slide`. O `App` a define a partir de `width`.') },
             { name: 'currentName', type: 'string', readonly: true, description: t('Name of the current scene, or an empty string.', 'Nome da cena atual, ou string vazia.') },
             { name: 'sceneNames', type: 'string[]', readonly: true, description: t('All registered names.', 'Todos os nomes registrados.') },
+            { name: 'restart(name, params?)', type: 'Promise<void>', description: t('Destroys the cached instance and goes to the scene again, so `onCreate(params)` runs on a fresh instance. Shortcut for `destroyScene(name)` followed by `go(name, { params })`.', 'Destrói a instância em cache e vai à cena de novo, então o `onCreate(params)` roda em uma instância nova. Atalho para `destroyScene(name)` seguido de `go(name, { params })`.') },
             { name: 'destroyScene(name)', type: 'void', description: t('Destroys the cached instance so the next `go` builds it again.', 'Destrói a instância em cache para que o próximo `go` a construa de novo.') },
           ],
         },
@@ -65,7 +68,7 @@ const page: DocPage = {
           rows: [
             { name: 'transition', type: "'none' | 'fade' | 'slide' | 'flip'", default: "'none'", description: t('`none` switches at once. `fade` fades the old scene out and the new one in. `slide` pushes the old scene out to the left while the new one enters from the right. `flip` squeezes the old scene to zero width, then grows the new one, like turning a card. A new `go()` during a slide or flip finishes it first.', '`none` troca na hora. `fade` esmaece a cena antiga e faz a nova aparecer. `slide` empurra a cena antiga para a esquerda enquanto a nova entra pela direita. `flip` comprime a cena antiga até largura zero e depois expande a nova, como virar uma carta. Um novo `go()` durante um slide ou flip conclui o anterior primeiro.') },
             { name: 'duration', type: 'number', default: '300', description: t('Total transition time in milliseconds. For `fade` the two halves (out and in) take half each.', 'Tempo total da transição em milissegundos. No `fade`, as duas metades (saída e entrada) levam metade cada.') },
-            { name: 'params', type: 'SceneParams', description: t('Object passed to `onCreate`.', 'Objeto passado a `onCreate`.') },
+            { name: 'params', type: 'SceneParams', description: t('Object passed to `onCreate` and to `onResume`.', 'Objeto passado a `onCreate` e a `onResume`.') },
           ],
         },
       ],
@@ -88,8 +91,8 @@ const page: DocPage = {
           kind: 'warning',
           title: t('Instances are cached', 'Instâncias ficam em cache'),
           text: t(
-            'A scene is constructed and `onCreate` runs only once per name. Going back to it later reuses the same instance and only calls `onResume`. Reset state in `onResume`, or call `destroyScene(name)` to force a fresh build.',
-            'Uma cena é construída e o `onCreate` roda apenas uma vez por nome. Voltar a ela depois reutiliza a mesma instância e só chama `onResume`. Reinicie o estado em `onResume`, ou chame `destroyScene(name)` para forçar uma construção nova.',
+            'A scene is constructed and `onCreate` runs only once per name. Going back to it later reuses the same instance and only calls `onResume(params)`, with the `params` of the new `go`. Reset state in `onResume`, or call `restart(name, params)` (or `destroyScene(name)`) to force a fresh build.',
+            'Uma cena é construída e o `onCreate` roda apenas uma vez por nome. Voltar a ela depois reutiliza a mesma instância e só chama `onResume(params)`, com os `params` do novo `go`. Reinicie o estado em `onResume`, ou chame `restart(name, params)` (ou `destroyScene(name)`) para forçar uma construção nova.',
           ),
         },
       ],

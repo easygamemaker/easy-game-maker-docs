@@ -8,7 +8,7 @@ const page: DocPage = {
     "Um bus de mixagem nomeado, com volume mestre próprio, obtido em app.audio.channel(name), que inicia, para e consulta sons independentemente dos outros canais.",
   ),
   source: 'src/engine/audio/AudioChannel.ts',
-  related: ['/audio/manager'],
+  related: ['/audio/manager', '/audio/bus', '/audio/sfx', '/audio/music'],
   sections: [
     {
       id: 'overview',
@@ -26,6 +26,15 @@ const page: DocPage = {
           text: t(
             "You get channels from [AudioManager](/audio/manager): `app.audio.channel('music')` returns the same instance every time for a given name. The class is exported, but constructing it yourself needs an `AudioContext`, which normally you do not have direct access to.",
             "Você obtém canais do [AudioManager](/audio/manager): `app.audio.channel('music')` devolve a mesma instância sempre que o nome se repete. A classe é exportada, mas construí-la exige um `AudioContext`, ao qual normalmente você não tem acesso direto.",
+          ),
+        },
+        {
+          type: 'callout',
+          kind: 'info',
+          title: t('Channels versus buses', 'Canais versus barramentos'),
+          text: t(
+            "Channels are the original layer: they feed the output directly, `play` on the same key restarts that sound, and the master and bus volumes do not apply to them. For overlapping effects, music crossfades, ducking and saved volumes use the newer [AudioBus](/audio/bus), [SfxPlayer](/audio/sfx) and [MusicPlayer](/audio/music). Both layers coexist and neither breaks the other.",
+            "Os canais são a camada original: alimentam a saída direto, o `play` na mesma chave reinicia aquele som, e os volumes do master e dos barramentos não se aplicam a eles. Para efeitos que se sobrepõem, crossfade de música, ducking e volumes salvos, use o [AudioBus](/audio/bus), o [SfxPlayer](/audio/sfx) e o [MusicPlayer](/audio/music), mais novos. As duas camadas convivem e nenhuma quebra a outra.",
           ),
         },
       ],

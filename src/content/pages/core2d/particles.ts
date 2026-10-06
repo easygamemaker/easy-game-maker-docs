@@ -8,7 +8,7 @@ const page: DocPage = {
     'Um sistema de partículas na CPU com pool fixo, emissão contínua, rajadas e tamanho e cor inicial/final.',
   ),
   source: 'src/engine/display/ParticleEmitter.ts',
-  related: ['/display/sprite', '/core/textures', '/gameplay/object-pool', '/core/visual-scene'],
+  related: ['/core/rng', '/display/sprite', '/core/textures', '/gameplay/object-pool', '/core/visual-scene'],
   sections: [
     {
       id: 'config',
@@ -37,6 +37,7 @@ const page: DocPage = {
             { name: 'startColor, endColor', type: '[r, g, b, a]', default: '[1,1,1,1], [1,1,1,0]', description: t('Colors from 0 to 1, interpolated over the life. The alpha channel fades the particle.', 'Cores de 0 a 1, interpoladas ao longo da vida. O canal alpha faz a partícula desaparecer.') },
             { name: 'angularVelocity, angularVelocityVariance', type: 'number', default: '0, 0', description: t('Spin in radians/s and its random variation. Each particle starts at a random rotation.', 'Giro em radianos/s e sua variação aleatória. Cada partícula começa com rotação aleatória.') },
             { name: 'loop', type: 'boolean', default: 'true', description: t('Only matters together with `duration`. With `loop: true` the emission timer restarts every `duration` seconds, so emission keeps going; with `loop: false` emission stops for good once `duration` runs out. Without a `duration`, emission is continuous either way.', 'Só importa junto com `duration`. Com `loop: true` o cronômetro de emissão reinicia a cada `duration` segundos, então a emissão continua; com `loop: false` a emissão para de vez quando `duration` acaba. Sem `duration`, a emissão é contínua nos dois casos.') },
+            { name: 'rng', type: 'Rng', description: t("Seeded generator for every random draw of the emitter (life, angle, speed, size, spin, rotation). Default: `Math.random`, so effects are not reproducible. Pass a fork (`sim.fork('fx')`) so visual effects never shift the simulation stream. Two emitters with equal config and equal seeds spawn identical particles, provided they are updated with the same `dt` values (call `update` yourself from a fixed step for that). See [Rng](/core/rng).", "Gerador com semente para todo sorteio do emissor (vida, ângulo, velocidade, tamanho, giro, rotação). Padrão: `Math.random`, então os efeitos não são reproduzíveis. Passe um fork (`sim.fork('fx')`) para que os efeitos visuais nunca desloquem o fluxo da simulação. Dois emissores com a mesma configuração e a mesma semente geram partículas idênticas, desde que sejam atualizados com os mesmos valores de `dt` (chame `update` você mesmo a partir de um passo fixo para isso). Veja [Rng](/core/rng).") },
             { name: 'duration', type: 'number', default: '-1', description: t('Seconds to emit for; `-1` means forever. For a one-shot timed effect combine it with `loop: false`; call `start()` to emit again.', 'Segundos de emissão; `-1` significa para sempre. Para um efeito único com tempo, combine com `loop: false`; chame `start()` para emitir de novo.') },
           ],
         },

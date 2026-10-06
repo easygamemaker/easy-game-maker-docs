@@ -129,6 +129,7 @@ export const NAVIGATION: NavSection[] = [
     pt: 'Guias',
     icon: '📘',
     items: [
+      item('/guide/whats-new-0-3', 'What is new in 0.3', 'Novidades da 0.3', 'NEW', '2d'),
       item('/guide/recipes-2d', '2D Recipes', 'Receitas 2D', undefined, '2d'),
       item('/guide/recipes-3d', '3D Recipes', 'Receitas 3D', undefined, '3d'),
       item('/guide/ai', 'Building with AI', 'Criando com IA'),
@@ -156,9 +157,12 @@ export const NAVIGATION: NavSection[] = [
     icon: '⚙️',
     items: [
       item('/core/app', 'App', 'App'),
+      item('/core/fixed-step', 'Fixed Step & Time', 'Passo Fixo & Tempo', 'NEW'),
+      item('/core/rng', 'Rng', 'Rng', 'NEW'),
       item('/core/scene', 'Scene & SceneManager', 'Scene & SceneManager'),
       item('/core/assets', 'AssetManager', 'AssetManager'),
       item('/core/textures', 'Texture & TextureCache', 'Texture & TextureCache'),
+      item('/core/texture-atlas', 'TextureAtlas', 'TextureAtlas', 'NEW'),
       item('/core/renderer', 'WebGLRenderer', 'WebGLRenderer'),
       item('/core/events', 'EventEmitter', 'EventEmitter'),
       item('/core/timer', 'TimerManager', 'TimerManager'),
@@ -208,6 +212,7 @@ export const NAVIGATION: NavSection[] = [
     icon: '✨',
     items: [
       item('/animation/tween', 'Tween', 'Tween'),
+      item('/animation/clips', 'Animation Clips', 'Clipes de Animação', 'NEW'),
       item('/animation/easing', 'Easing', 'Easing'),
       item('/animation/transitions', 'TransitionManager', 'TransitionManager'),
     ],
@@ -243,6 +248,7 @@ export const NAVIGATION: NavSection[] = [
     items: [
       item('/input/keyboard-mouse', 'Keyboard & Mouse', 'Teclado & Mouse'),
       item('/input/gamepad', 'GamepadManager', 'GamepadManager'),
+      item('/input/action-map', 'ActionMap', 'ActionMap', 'NEW'),
     ],
   },
   {
@@ -255,6 +261,9 @@ export const NAVIGATION: NavSection[] = [
     items: [
       item('/audio/manager', 'AudioManager', 'AudioManager'),
       item('/audio/channel', 'AudioChannel', 'AudioChannel'),
+      item('/audio/bus', 'AudioBus & Mixing', 'AudioBus & Mixagem', 'NEW'),
+      item('/audio/sfx', 'SfxPlayer', 'SfxPlayer', 'NEW'),
+      item('/audio/music', 'MusicPlayer', 'MusicPlayer', 'NEW'),
     ],
   },
   {

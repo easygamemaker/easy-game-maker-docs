@@ -8,7 +8,7 @@ const page: DocPage = {
     "app.input: consulta de teclas pressionadas, leitura do ponteiro em coordenadas do canvas e inscrição em eventos de teclado e ponteiro.",
   ),
   source: 'src/engine/input/InputManager.ts',
-  related: ['/input/gamepad', '/physics/body', '/camera'],
+  related: ['/input/action-map', '/input/gamepad', '/physics/body', '/camera'],
   sections: [
     {
       id: 'overview',
@@ -50,10 +50,10 @@ const page: DocPage = {
         {
           type: 'callout',
           kind: 'info',
-          title: t('What is not there', 'O que não existe'),
+          title: t('What is not there, and what to use instead', 'O que não existe, e o que usar no lugar'),
           text: t(
-            "There is no `justPressed` for keys, no mouse button identification, no wheel and no multi-touch state: `pointer` tracks the last pointer only. For one-shot actions listen to `keydown` (ignoring `repeat`) or track the previous frame yourself. Listeners are called with the payload only.",
-            "Não há `justPressed` para teclas, identificação do botão do mouse, roda nem estado multitoque: `pointer` acompanha apenas o último ponteiro. Para ações de disparo único, escute `keydown` (ignorando `repeat`) ou guarde o quadro anterior você mesmo. Os listeners recebem só o payload.",
+            "`app.input` has no `justPressed` for keys, no mouse button identification, no wheel and no multi-touch state: `pointer` tracks the last pointer only. For one-shot actions, key edges, several players, gamepad buttons on the same action, rebinding and taps shorter than a frame, use an [ActionMap](/input/action-map): it gives `pressed` and `released` per frame. `isKeyDown` only reads the keys held right now, so a `keydown` followed by a `keyup` between two frames is invisible to it. You can still listen to `keydown` (ignoring `repeat`) for a simple one-shot. Listeners are called with the payload only.",
+            "O `app.input` não tem `justPressed` para teclas, identificação do botão do mouse, roda nem estado multitoque: `pointer` acompanha apenas o último ponteiro. Para ações de disparo único, bordas de tecla, vários jogadores, botões de controle na mesma ação, remapeamento e toques mais curtos que um quadro, use um [ActionMap](/input/action-map): ele dá `pressed` e `released` por quadro. O `isKeyDown` só lê as teclas seguradas agora, então um `keydown` seguido de um `keyup` entre dois quadros é invisível para ele. Você ainda pode escutar `keydown` (ignorando `repeat`) para um disparo único simples. Os listeners recebem só o payload.",
           ),
         },
         {

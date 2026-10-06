@@ -8,7 +8,7 @@ const page: DocPage = {
     'Desenha uma textura em uma posição, com tamanho, cor de tingimento e as propriedades de transformação usuais.',
   ),
   source: 'src/engine/display/Sprite.ts',
-  related: ['/display/animated-sprite', '/core/assets', '/core/textures', '/display/display-object'],
+  related: ['/display/animated-sprite', '/core/texture-atlas', '/core/assets', '/core/textures', '/display/display-object'],
   sections: [
     {
       id: 'create',
@@ -42,6 +42,7 @@ const page: DocPage = {
           rows: [
             { name: 'texture', type: 'Texture | null', description: t('Assign a new one at any time.', 'Atribua uma nova a qualquer momento.') },
             { name: 'tint', type: '[number, number, number, number]', default: '[1, 1, 1, 1]', description: t('RGBA (Red, Green, Blue, Alpha) multiplier from 0 to 1. `[1,1,1,1]` shows the texture unchanged.', 'Multiplicador RGBA (Red, Green, Blue, Alpha, ou seja, vermelho, verde, azul e opacidade) de 0 a 1. `[1,1,1,1]` mostra a textura sem alteração.') },
+            { name: 'setFrame(texture)', type: 'void', description: t("Shows an atlas frame: sets the texture, then `width` and `height` to the frame size in pixels and, when the frame carries an anchor (`atlas.frame(name).anchor`), `anchorX` and `anchorY` to it. The anchor is a fraction of the frame (0 is the left or top edge, 1 the right or bottom edge) and is the point that sits at `x, y` and that rotation and scale pivot around. For a trimmed frame it is measured against the original, untrimmed frame, so it can fall outside 0..1. A texture without an anchor leaves the current one. Because the size is the frame size, scale with `scaleX` and `scaleY`. See [TextureAtlas](/core/texture-atlas).", "Mostra um quadro de atlas: define a textura, depois `width` e `height` com o tamanho do quadro em pixels e, quando o quadro tem âncora (`atlas.frame(name).anchor`), `anchorX` e `anchorY` com ela. A âncora é uma fração do quadro (0 é a borda esquerda ou de cima, 1 a borda direita ou de baixo) e é o ponto que fica em `x, y` e em torno do qual rotação e escala giram. Em um quadro cortado, ela é medida no quadro original, sem corte, então pode cair fora de 0..1. Uma textura sem âncora mantém a atual. Como o tamanho é o do quadro, escale com `scaleX` e `scaleY`. Veja [TextureAtlas](/core/texture-atlas).") },
             { name: 'setTintRGB(r, g, b)', type: 'void', description: t('Sets `tint` with alpha 1.', 'Define `tint` com alpha 1.') },
             { name: 'displayWidth, displayHeight', type: 'number', readonly: true, description: t('`width`/`height`, or the texture size when they are 0.', '`width`/`height`, ou o tamanho da textura quando são 0.') },
             { name: 'getBounds()', type: 'Bounds', description: t('Top-left corner and size using the anchor (default 0.5, so `x, y` is the center).', 'Canto superior esquerdo e tamanho usando a âncora (padrão 0,5, então `x, y` é o centro).') },
